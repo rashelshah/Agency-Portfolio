@@ -254,18 +254,18 @@ $$("[data-magnetic]").forEach((el) => {
 
 /* ---------- project viewer (thumbnail expands to a full-screen story) ---------- */
 const PROJECTS = [
-  { name: "Marlow & Co", c: "#f25f36", icon: "d-browser", client: "MARLOW & CO", kind: "E-COMMERCE WEBSITE",
-    lead: "Placeholder: a sharp one-line story about Forge — the problem, the build and the result.",
-    tags: ["WEBSITE", "SHOPIFY", "BRANDING", "MOTION"], stats: [["+64%", "CONVERSION"], ["1.1s", "LOAD TIME"], ["6 WKS", "TO LAUNCH"]] },
-  { name: "Ledgerly", c: "#2f7a72", icon: "d-gear", client: "LEDGERLY", kind: "FINANCE DASHBOARD",
-    lead: "Placeholder: a sharp one-line story about PRODSYNC — the problem, the build and the result.",
+  { name: "Forge", c: "#f25f36", icon: "d-browser", client: "Forge", kind: "Agentic AI Website",
+    lead: "Forge is an AI-powered startup validation and execution platform that helps founders transform ideas into actionable business plans, roadmaps, and growth strategies. It combines intelligent research, market analysis, and project management tools to guide startups from concept to launch.",
+    tags: ["WEBSITE", "AUTOMATION", "AI AGENTS", "INTEGRATIONS"], stats: [["+64%", "CONVERSION"], ["1.1s", "LOAD TIME"], ["6 WKS", "TO LAUNCH"]] },
+  { name: "PRODSYNC", c: "#2f7a72", icon: "d-gear", client: "Tubelight Mediaworks", kind: "SAAS",
+    lead: "ProdSync is a production management platform for film, television, and media teams that streamlines crew management, scheduling, call sheets, logistics, expenses, and reporting. It centralizes production workflows into a single system, improving coordination and operational efficiency.",
     tags: ["SOFTWARE", "SAAS", "REACT", "API"], stats: [["12K", "ACTIVE USERS"], ["-40%", "REPORT TIME"], ["99.9%", "UPTIME"]] },
-  { name: "Parcel Pilot", c: "#e7a3b3", icon: "d-robot", client: "PARCEL PILOT", kind: "LOGISTICS AUTOMATION",
-    lead: "Placeholder: a sharp one-line story about Glyph — the problem, the build and the result.",
-    tags: ["AUTOMATION", "AI AGENTS", "INTEGRATIONS"], stats: [["3,400", "HRS SAVED / MO"], ["0", "MISSED ORDERS"], ["4 WKS", "TO LAUNCH"]] },
-  { name: "Nimbus", c: "#6aa4c8", icon: "d-bolt", client: "NIMBUS", kind: "MOBILE APP",
-    lead: "A weather-meets-planning app with a personality. Native-feeling on iOS and Android from a single codebase.",
-    tags: ["MOBILE APP", "IOS", "ANDROID", "UI/UX"], stats: [["4.8★", "APP STORE"], ["200K", "DOWNLOADS"], ["10 WKS", "TO LAUNCH"]] },
+  { name: "Glyph", c: "#e7a3b3", icon: "d-robot", client: "Glyph", kind: "Collaborative Latex Editor",
+    lead: "Collaborative Latex Editor",
+    tags: ["Collaboration", "EDITOR", "INTEGRATIONS"], stats: [["3,400", "HRS SAVED / MO"], ["0", "MISSED ORDERS"], ["4 WKS", "TO LAUNCH"]] },
+  { name: "Crypton AI", c: "#6aa4c8", icon: "d-bolt", client: "Crypton AI", kind: "WEBSITE",
+    lead: "Crypton AI is a modern cryptocurrency analysis and trading assistant that leverages AI to provide real-time insights, portfolio analysis, smart alerts, and a risk-free trading simulator.",
+    tags: ["Website", "SAAS", "REACT", "UI/UX"], stats: [["4.8★", "APP STORE"], ["200K", "DOWNLOADS"], ["10 WKS", "TO LAUNCH"]] },
 ];
 {
   const v = $(".viewer"), media = $(".viewer__media"), title = $(".viewer__title"), dir = $(".viewer__dir");
@@ -292,24 +292,33 @@ const PROJECTS = [
 
   // Split wipe: a solid centre block plus two frayed dry-brush edge sprites. The block and sprites only move
   // (mask-position/size), so nothing is re-decoded per frame -> no flicker. Opens from the middle, sweeps sideways.
-  const SW = 150, SH = 1024, EDGE = 40;
+  const SW = 170, SH = 1024, EDGE = 28;
   const halo = $(".viewer-halo");
   let sprites = null, spritesReady = null;
+  // One side of the wipe. Opaque body on the left, a dry-brush fringe to the right: thin bristle streaks of varying length,
+  // broken into dashes, plus loose flecks beyond the edge. makeSprite(true) mirrors it for the other side.
   const makeSprite = (flip) => {
     const c = document.createElement("canvas"); c.width = SW; c.height = SH;
     const ctx = c.getContext("2d"), img = ctx.createImageData(SW, SH), px = img.data;
-    const ph = Array.from({ length: 6 }, () => rnd(0, 6.283)), strand = new Float32Array(SH);
-    for (let y = 0; y < SH;) { const g = 3 + Math.floor(rnd(0, 9)), L = Math.pow(Math.random(), 2.6) * 46 - 6; for (let j = 0; j < g; j++) strand[(y + j) % SH] = L; y += g; }
+    const ph = Array.from({ length: 6 }, () => rnd(0, 6.283));
+    // bristle length per row: heavy-tailed, correlated with the row above so strands read as streaks, not bars
+    const L = new Float32Array(SH); let prev = 0;
+    for (let y = 0; y < SH; y++) { const fresh = Math.pow(Math.random(), 3) * 74; prev = Math.random() < 0.35 ? fresh : prev * 0.82 + fresh * 0.18; L[y] = prev; }
+    const set = (x, y, a) => { if (x < 0 || x >= SW) return; const X = flip ? SW - 1 - x : x, i = (y * SW + X) * 4; px[i] = px[i + 1] = px[i + 2] = 255; px[i + 3] = Math.max(px[i + 3], a * 255); };
     for (let y = 0; y < SH; y++) {
-      let base = EDGE; for (let k = 1; k <= 6; k++) base += (16 / k) * Math.sin((6.283185 * k * y) / SH + ph[k - 1]);
-      const edge = base + strand[y] + rnd(-2.5, 2.5);
-      for (let x = 0; x < SW; x++) {
-        let a = x < edge - 22 ? 1 : x > edge ? 0 : (edge - x) / 22; // frayed zone: dry-brush dropout
-        if (a < 1 && a > 0) a = Math.random() < a * 1.15 ? Math.min(1, a * 2.2) : 0;
-        const X = flip ? SW - 1 - x : x, i = (y * SW + X) * 4;
-        px[i] = px[i + 1] = px[i + 2] = 255; px[i + 3] = a * 255;
+      let wob = 0; for (let k = 1; k <= 6; k++) wob += (11 / k) * Math.sin((6.283185 * k * y) / SH + ph[k - 1]);
+      const body = Math.max(6, EDGE + wob + rnd(-2, 2));          // solid paper
+      const reach = body + L[y];                                  // end of this row's bristle
+      for (let x = 0; x < body; x++) set(x, y, 1);
+      // fringe as dry-brush dashes: alternating paint / gap runs that get sparser towards the tip
+      let x = body, on = true;
+      while (x < reach) {
+        const run = on ? 3 + Math.random() * 12 : 2 + Math.random() * 9, t = (x - body) / Math.max(1, reach - body);
+        if (on && Math.random() > t * 0.55) for (let j = 0; j < run && x + j < reach; j++) set(Math.floor(x + j), y, 1 - t * 0.35);
+        x += run; on = !on;
       }
     }
+    for (let n = 0; n < 150; n++) { const y = Math.floor(rnd(0, SH)), x = Math.floor(EDGE + rnd(10, SW - EDGE - 12)); const s = Math.random() < 0.3 ? 2 : 1; for (let dy = 0; dy < s; dy++) for (let dx = 0; dx < s + 1; dx++) set(x + dx, (y + dy) % SH, 0.9); } // flecks
     ctx.putImageData(img, 0, 0);
     return c.toDataURL("image/png");
   };
@@ -332,9 +341,9 @@ const PROJECTS = [
     for (const k in css) { el.style[k] = css[k]; el.style["webkit" + k[0].toUpperCase() + k.slice(1)] = css[k]; }
   };
   const clearMask = (el) => { el.style.maskImage = el.style.webkitMaskImage = "none"; };
-  const sMax = () => innerWidth / 2 + 40;
+  const sMax = () => innerWidth / 2 + 60;
   const paint = (p) => {
-    const s = -25 + (sMax() + 25) * p;
+    const s = sMax() * p;
     if (p >= 1) { clearMask(v); halo.style.visibility = "hidden"; return; }
     setMask(v, s); setMask(halo, s + 34); halo.style.visibility = "visible";
   };
@@ -373,7 +382,8 @@ const PROJECTS = [
     gsap.timeline({ onComplete: () => { gsap.set([v, halo], { visibility: "hidden" }); isOpen = busy = false; lenis?.start(); v.setAttribute("aria-hidden", "true"); } })
       .to(ui(), { opacity: 0, duration: 0.25 })
       .add(() => v.scrollTo({ top: 0 }))
-      .to(o, { p: 0, duration: 0.95, ease: "power2.inOut", onUpdate: () => draw(o) });
+      .to(o, { p: 0, duration: 0.95, ease: "power2.inOut", onUpdate: () => draw(o) })
+      .to([v, halo], { opacity: 0, duration: 0.12 });
   }
 
   function go(dirn) {
