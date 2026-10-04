@@ -14,13 +14,28 @@ const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 /* ---------- paper: torn edges ---------- */
 // jagged SVG strip glued to the top of every [data-tear] section (rim = paper fibre, fill = section colour)
 function tearSvg(color) {
-  const pts = (lo, hi) => Array.from({ length: 81 }, (_, i) => `L${i * 12.5} ${rnd(lo, hi).toFixed(1)}`).join("");
+  const N = 320, W = 1600;
+  const p1 = rnd(0, 6), p2 = rnd(0, 6);
+  // two slow waves + fine jitter + occasional nick = a fibrous tear rather than a zig-zag
+  const ys = Array.from({ length: N + 1 }, (_, i) => 14 + 4 * Math.sin(i * 0.07 + p1) + 2.5 * Math.sin(i * 0.31 + p2) + rnd(-2.2, 2.2) + (Math.random() < 0.05 ? rnd(-5, 5) : 0));
+  const edge = (dy) => ys.map((y, i) => `L${((i / N) * W).toFixed(1)} ${(y + dy).toFixed(1)}`).join("");
+  const dark = color.toLowerCase() === "#1a1a1a";
   const ns = "http://www.w3.org/2000/svg";
   const svg = document.createElementNS(ns, "svg");
-  svg.setAttribute("viewBox", "0 0 1000 46");
+  svg.setAttribute("viewBox", `0 0 ${W} 30`);
   svg.setAttribute("preserveAspectRatio", "none");
   svg.classList.add("tear");
-  svg.innerHTML = `<path d="M0 46${pts(4, 20)}L1000 46Z" fill="#f3e4c4"/><path d="M0 46${pts(14, 30)}L1000 46Z" fill="${color}"/>`;
+  if (dark) {
+    // exposed white paper core: a broken fibre line along the tear plus tiny hairs standing off it
+    const dash = [14, 4, 3, 9, 22, 5, 6, 12].map((d) => d * rnd(0.6, 1.4)).join(" ");
+    const hairs = Array.from({ length: 90 }, () => {
+      const i = Math.floor(rnd(0, N)), x = (i / N) * W, y = ys[i] - 1.5;
+      return `<path d="M${x.toFixed(1)} ${y.toFixed(1)}l${rnd(-5, 5).toFixed(1)} ${rnd(-4.5, -1).toFixed(1)}" stroke="#f3ecdc" stroke-opacity="${rnd(0.3, 0.8).toFixed(2)}" stroke-width="1" vector-effect="non-scaling-stroke" fill="none"/>`;
+    }).join("");
+    svg.innerHTML = `<path d="M0 30${edge(0)}L${W} 30Z" fill="#050505"/><path d="M0 ${ys[0] - 1}${ys.map((y, i) => `L${((i / N) * W).toFixed(1)} ${(y - 1).toFixed(1)}`).join("")}" fill="none" stroke="#f3ecdc" stroke-opacity=".85" stroke-width="1.6" stroke-dasharray="${dash}" vector-effect="non-scaling-stroke"/>${hairs}`;
+  } else {
+    svg.innerHTML = `<path d="M0 30${edge(-3.4)}L${W} 30Z" fill="#fffaf0" opacity=".9"/><path d="M0 30${edge(0)}L${W} 30Z" fill="${color}"/>`;
+  }
   return svg;
 }
 $$("[data-tear]").forEach((s) => s.prepend(tearSvg(s.dataset.tear)));
