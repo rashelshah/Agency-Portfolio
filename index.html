@@ -68,6 +68,32 @@
   <p class="menu__foot hand">HELLO@FOXLY.STUDIO &nbsp;·&nbsp; REMOTE · WORLDWIDE</p>
 </nav>
 
+
+<!-- PROJECT VIEWER -->
+<div class="viewer-halo" aria-hidden="true"></div>
+<div class="viewer" aria-hidden="true" role="dialog" aria-label="Project" data-lenis-prevent>
+  <section class="viewer__top">
+    <header class="viewer__head"><h2 class="viewer__title"></h2><p class="viewer__dir hand"></p></header>
+    <button class="viewer__close" aria-label="Close project" data-cursor="CLOSE"><span></span><span></span></button>
+    <div class="viewer__stage">
+      <div class="viewer__media halftone">
+        <img class="viewer__img" alt="" /><svg class="rough"><use href="#d-browser"/></svg><b class="brush"></b>
+        <button class="viewer__play hand" type="button">CASE<br>STUDY ↓</button>
+      </div>
+    </div>
+    <nav class="viewer__nav hand"><button class="viewer__prev" aria-label="Previous project">←</button><span class="viewer__count"></span><button class="viewer__next" aria-label="Next project">→</button></nav>
+  </section>
+  <section class="vd">
+    <span class="side-label hand">— THE STORY</span>
+    <p class="vd__lead"></p>
+    <div class="vd__cols">
+      <div><h3 class="hand">WHAT WE DID</h3><ul class="vd__tags hand"></ul></div>
+      <ul class="vd__stats"></ul>
+    </div>
+    <button class="btn vd__cta" type="button" data-magnetic>START A PROJECT LIKE THIS</button>
+  </section>
+</div>
+
 <main id="top">
 
   <!-- HERO -->
@@ -112,33 +138,52 @@
     <span class="side-label hand">— THE LATEST</span>
     <h2 class="h2" data-split="lines">SELECTED<br>WORK</h2>
     <div class="work__grid">
-      <a class="card" href="#contact" data-cursor="VIEW" style="--c:#f25f36">
+      <button type="button" class="card" data-project="0" data-cursor="VIEW" style="--c:#f25f36">
         <div class="card__img halftone">
           <img src="/src/assets/forge.png" alt="Forge Project" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;" />
           <b class="brush"></b>
         </div>
         <h3>Forge</h3><p class="hand">WEBSITE · AGENTIC AI · SOFTWARE</p>
-      </a>
-      <a class="card card--low" href="#contact" data-cursor="VIEW" style="--c:#2f7a72">
+      </button>
+      <button type="button" class="card card--low" data-project="1" data-cursor="VIEW" style="--c:#2f7a72">
         <div class="card__img halftone">
           <img src="/src/assets/prodsync.png" alt="Prodsync Project" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;" />
           <b class="brush"></b>
         </div>
         <h3>PRODSYNC - From Planning to Production</h3><p class="hand">SOFTWARE · SAAS · REACT</p>
-      </a>
-      <a class="card" href="#contact" data-cursor="VIEW" style="--c:#e7a3b3">
+      </button>
+      <button type="button" class="card" data-project="2" data-cursor="VIEW" style="--c:#e7a3b3">
         <div class="card__img halftone">
           <img src="/src/assets/glyph.png" alt="Glyph Project" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;" />
           <b class="brush"></b>
         </div>
         <h3>GLYPH</h3><p class="hand">LATEX EDITOR · AI · WEBSITE</p>
-      </a>
-      <a class="card card--low" href="#contact" data-cursor="VIEW" style="--c:#6aa4c8">
-        <div class="card__img halftone"><svg class="rough"><use href="#d-bolt"/></svg><b class="brush">Nimbus</b></div>
-        <h3>NIMBUS — MOBILE APP</h3><p class="hand">APP · IOS · ANDROID</p>
-      </a>
+      </button>
+      <button type="button" class="card card--low" data-project="3" data-cursor="VIEW" style="--c:#6aa4c8">
+        <div class="card__img halftone">
+          <img src="/src/assets/cryptonai.png" alt="Crypton AI Project" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;" />
+          <b class="brush"></b>
+        </div>
+        <h3>Crypton AI</h3><p class="hand">AI · WEBSITE · CRYPTO</p>
+      </button>
     </div>
     <a class="btn" href="#contact" data-magnetic>VIEW ALL WORK</a>
+  </section>
+
+  <!-- CLIENTS -->
+  <section class="clients paper" id="clients" data-theme="light" data-tear="#faeed9">
+    <span class="side-label hand">— WHO WE HELP</span>
+    <h2 class="h2" data-split="lines">SELECTED<br>CLIENTS</h2>
+    <div class="clients__grid" data-reveal>
+      <div class="client-logo"><h3 class="brush">Y Combinator</h3></div>
+      <div class="client-logo"><h3 class="brush">Stripe</h3></div>
+      <div class="client-logo"><h3 class="brush">OpenAI</h3></div>
+      <div class="client-logo"><h3 class="brush">Framer</h3></div>
+      <div class="client-logo"><h3 class="brush">Vercel</h3></div>
+      <div class="client-logo"><h3 class="brush">Shopify</h3></div>
+      <div class="client-logo"><h3 class="brush">Linear</h3></div>
+      <div class="client-logo"><h3 class="brush">Notion</h3></div>
+    </div>
   </section>
 
   <!-- SERVICES: pinned horizontal scroll -->

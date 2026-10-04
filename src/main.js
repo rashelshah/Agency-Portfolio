@@ -251,6 +251,156 @@ $$("[data-magnetic]").forEach((el) => {
   el.addEventListener("mouseleave", () => gsap.to(el, { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1,.4)" }));
 });
 
+
+/* ---------- project viewer (thumbnail expands to a full-screen story) ---------- */
+const PROJECTS = [
+  { name: "Marlow & Co", c: "#f25f36", icon: "d-browser", client: "MARLOW & CO", kind: "E-COMMERCE WEBSITE",
+    lead: "Placeholder: a sharp one-line story about Forge — the problem, the build and the result.",
+    tags: ["WEBSITE", "SHOPIFY", "BRANDING", "MOTION"], stats: [["+64%", "CONVERSION"], ["1.1s", "LOAD TIME"], ["6 WKS", "TO LAUNCH"]] },
+  { name: "Ledgerly", c: "#2f7a72", icon: "d-gear", client: "LEDGERLY", kind: "FINANCE DASHBOARD",
+    lead: "Placeholder: a sharp one-line story about PRODSYNC — the problem, the build and the result.",
+    tags: ["SOFTWARE", "SAAS", "REACT", "API"], stats: [["12K", "ACTIVE USERS"], ["-40%", "REPORT TIME"], ["99.9%", "UPTIME"]] },
+  { name: "Parcel Pilot", c: "#e7a3b3", icon: "d-robot", client: "PARCEL PILOT", kind: "LOGISTICS AUTOMATION",
+    lead: "Placeholder: a sharp one-line story about Glyph — the problem, the build and the result.",
+    tags: ["AUTOMATION", "AI AGENTS", "INTEGRATIONS"], stats: [["3,400", "HRS SAVED / MO"], ["0", "MISSED ORDERS"], ["4 WKS", "TO LAUNCH"]] },
+  { name: "Nimbus", c: "#6aa4c8", icon: "d-bolt", client: "NIMBUS", kind: "MOBILE APP",
+    lead: "A weather-meets-planning app with a personality. Native-feeling on iOS and Android from a single codebase.",
+    tags: ["MOBILE APP", "IOS", "ANDROID", "UI/UX"], stats: [["4.8★", "APP STORE"], ["200K", "DOWNLOADS"], ["10 WKS", "TO LAUNCH"]] },
+];
+{
+  const v = $(".viewer"), media = $(".viewer__media"), title = $(".viewer__title"), dir = $(".viewer__dir");
+  let cur = 0, isOpen = false, busy = false, lastCard = null;
+  const pad = (n) => String(n).padStart(2, "0");
+
+  const fill = (i) => {
+    const p = PROJECTS[i], card = $$(".card")[i];
+    const name = $("h3", card).textContent.trim(), meta = $("p", card).textContent.trim();
+    media.style.setProperty("--c", p.c);
+    $(".viewer__img", media).src = "";
+    media.classList.remove("has-img");
+    $("svg use", media).setAttribute("href", "#" + p.icon);
+    $("b", media).textContent = p.name;
+    title.textContent = name;
+    dir.textContent = meta;
+    $(".viewer__count").textContent = `WORK ${pad(i + 1)} / ${pad(PROJECTS.length)}`;
+    $(".vd__lead").textContent = p.lead;
+    $(".vd__tags").innerHTML = meta.split("·").map((t) => `<li>${t.trim()}</li>`).join("");
+    $(".vd__stats").innerHTML = p.stats.map(([n, l]) => `<li><b>${n}</b><span>${l}</span></li>`).join("");
+  };
+
+  const ui = () => [".viewer__head", ".viewer__close", ".viewer__nav", ".viewer__play"];
+
+  // Split wipe: a solid centre block plus two frayed dry-brush edge sprites. The block and sprites only move
+  // (mask-position/size), so nothing is re-decoded per frame -> no flicker. Opens from the middle, sweeps sideways.
+  const SW = 150, SH = 1024, EDGE = 40;
+  const halo = $(".viewer-halo");
+  let sprites = null, spritesReady = null;
+  const makeSprite = (flip) => {
+    const c = document.createElement("canvas"); c.width = SW; c.height = SH;
+    const ctx = c.getContext("2d"), img = ctx.createImageData(SW, SH), px = img.data;
+    const ph = Array.from({ length: 6 }, () => rnd(0, 6.283)), strand = new Float32Array(SH);
+    for (let y = 0; y < SH;) { const g = 3 + Math.floor(rnd(0, 9)), L = Math.pow(Math.random(), 2.6) * 46 - 6; for (let j = 0; j < g; j++) strand[(y + j) % SH] = L; y += g; }
+    for (let y = 0; y < SH; y++) {
+      let base = EDGE; for (let k = 1; k <= 6; k++) base += (16 / k) * Math.sin((6.283185 * k * y) / SH + ph[k - 1]);
+      const edge = base + strand[y] + rnd(-2.5, 2.5);
+      for (let x = 0; x < SW; x++) {
+        let a = x < edge - 22 ? 1 : x > edge ? 0 : (edge - x) / 22; // frayed zone: dry-brush dropout
+        if (a < 1 && a > 0) a = Math.random() < a * 1.15 ? Math.min(1, a * 2.2) : 0;
+        const X = flip ? SW - 1 - x : x, i = (y * SW + X) * 4;
+        px[i] = px[i + 1] = px[i + 2] = 255; px[i + 3] = a * 255;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    return c.toDataURL("image/png");
+  };
+  function buildMask() {
+    if (spritesReady) return spritesReady;
+    spritesReady = new Promise((resolve) => {
+      const R = makeSprite(false), L = makeSprite(true);
+      let n = 0; [R, L].forEach((u) => { const im = new Image(); im.onload = im.onerror = () => ++n === 2 && ((sprites = { R: `url(${R})`, L: `url(${L})` }), resolve()); im.src = u; });
+    });
+    return spritesReady;
+  }
+  const setMask = (el, s) => {
+    const cx = innerWidth / 2, blockW = Math.max(0, s * 2);
+    const css = {
+      maskImage: `linear-gradient(#000,#000), ${sprites.R}, ${sprites.L}`,
+      maskSize: `${blockW}px 100%, ${SW}px ${SH}px, ${SW}px ${SH}px`,
+      maskPosition: `${cx - s}px 0, ${cx + s - EDGE}px 0, ${cx - s - (SW - EDGE)}px 0`,
+      maskRepeat: "no-repeat, repeat-y, repeat-y",
+    };
+    for (const k in css) { el.style[k] = css[k]; el.style["webkit" + k[0].toUpperCase() + k.slice(1)] = css[k]; }
+  };
+  const clearMask = (el) => { el.style.maskImage = el.style.webkitMaskImage = "none"; };
+  const sMax = () => innerWidth / 2 + 40;
+  const paint = (p) => {
+    const s = -25 + (sMax() + 25) * p;
+    if (p >= 1) { clearMask(v); halo.style.visibility = "hidden"; return; }
+    setMask(v, s); setMask(halo, s + 34); halo.style.visibility = "visible";
+  };
+  const draw = (o) => paint(o.p);
+  (window.requestIdleCallback || setTimeout)(() => buildMask());
+
+  async function open(i, card) {
+    if (isOpen || busy) return;
+    busy = true; isOpen = true; cur = i; lastCard = card;
+    fill(i);
+    v.scrollTop = 0;
+    lenis?.stop();
+    await buildMask();
+    const o = { p: 0 };
+    draw(o);
+    gsap.set([v, halo], { visibility: "visible", opacity: 1 });
+    gsap.set(ui(), { opacity: 0 });
+    gsap.timeline({ onComplete: () => { clearMask(v); gsap.set(halo, { visibility: "hidden" }); busy = false; } })
+      .to(o, { p: 1, duration: 1.2, ease: "power2.inOut", onUpdate: () => draw(o) })
+      .fromTo($("b", media), { yPercent: 50, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.9, ease: "power3.out" }, 0.7)
+      .fromTo(title, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power4.out" }, 0.85)
+      .to(".viewer__head", { opacity: 1, duration: 0.01 }, 0.84)
+      .fromTo(dir, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6 }, 1.05)
+      .fromTo(".viewer__close", { scale: 0, rotate: -90 }, { scale: 1, rotate: 0, opacity: 1, duration: 0.6, ease: "back.out(2)" }, 1.0)
+      .fromTo(".viewer__play", { scale: 0 }, { scale: 1, opacity: 1, duration: 0.7, ease: "back.out(2)" }, 1.1)
+      .fromTo(".viewer__nav", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 }, 1.15);
+    v.setAttribute("aria-hidden", "false");
+  }
+
+  function close() {
+    if (!isOpen || busy) return;
+    busy = true;
+    const o = { p: 1 };
+    draw(o);
+    gsap.set(halo, { visibility: "visible" });
+    gsap.timeline({ onComplete: () => { gsap.set([v, halo], { visibility: "hidden" }); isOpen = busy = false; lenis?.start(); v.setAttribute("aria-hidden", "true"); } })
+      .to(ui(), { opacity: 0, duration: 0.25 })
+      .add(() => v.scrollTo({ top: 0 }))
+      .to(o, { p: 0, duration: 0.95, ease: "power2.inOut", onUpdate: () => draw(o) });
+  }
+
+  function go(dirn) {
+    if (!isOpen || busy) return;
+    busy = true;
+    const next = (cur + dirn + PROJECTS.length) % PROJECTS.length;
+    gsap.timeline({ onComplete: () => (busy = false) })
+      .to([media, title, dir], { x: -60 * dirn, opacity: 0, duration: 0.3, ease: "power2.in" })
+      .add(() => { cur = next; fill(next); })
+      .fromTo([media, title, dir], { x: 60 * dirn, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, ease: "power3.out" });
+  }
+
+  const PROJECTS_CARDS = $$(".card");
+  PROJECTS_CARDS.forEach((c) => c.addEventListener("click", () => open(+c.dataset.project, c)));
+  $(".viewer__close").addEventListener("click", close);
+  $(".viewer__prev").addEventListener("click", () => go(-1));
+  $(".viewer__next").addEventListener("click", () => go(1));
+  $(".viewer__play").addEventListener("click", () => v.scrollTo({ top: innerHeight, behavior: "smooth" }));
+  $(".vd__cta").addEventListener("click", () => { close(); setTimeout(() => scrollTo("#contact"), 1100); });
+  addEventListener("keydown", (e) => { if (!isOpen) return; if (e.key === "Escape") close(); if (e.key === "ArrowRight") go(1); if (e.key === "ArrowLeft") go(-1); });
+
+  // story section reveals as the viewer scrolls
+  $$(".vd__lead, .vd__cols > *, .vd__cta").forEach((el) =>
+    gsap.from(el, { y: 50, opacity: 0, duration: 0.9, ease: "power3.out", scrollTrigger: { trigger: el, scroller: v, start: "top 88%" } })
+  );
+}
+
 /* go */
 document.fonts.ready.then(() => {
   init();
