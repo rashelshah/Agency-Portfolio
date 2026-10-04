@@ -89,7 +89,7 @@ svg { display: block; }
 .menu__foot { margin-top: 40px; font-size: 18px; color: var(--ink); }
 
 /* ---------- headings ---------- */
-.h2 { font: 400 clamp(56px, 11vw, 170px)/.88 var(--display); text-transform: uppercase; color: var(--orange); letter-spacing: -.01em; }
+.h2 { font: 400 clamp(44px, 8.5vw, 120px)/.88 var(--display); text-transform: uppercase; color: var(--orange); letter-spacing: -.01em; }
 .h2--cream { color: var(--cream); }
 .side-label { position: absolute; left: 14px; top: 120px; writing-mode: vertical-rl; transform: rotate(180deg); font-size: 18px; letter-spacing: .12em; color: inherit; opacity: .85; }
 section { position: relative; }
