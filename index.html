@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Foxly — Websites, Software &amp; Automations</title>
+  <meta name="description" content="Foxly is a mixed-media digital studio building websites, software and automations for brands with an edge." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='16' fill='%23f25f36'/><path d='M18 4 8 18h7l-2 10 11-15h-7z' fill='%23faeed9'/></svg>" />
+  <script type="module" src="/src/main.js"></script>
+</head>
+<body>
+
+<!-- shared SVG: hand-cut / ink-bleed filter + doodle symbols -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence id="rough-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="3" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <symbol id="d-bolt" viewBox="0 0 100 100"><path d="M58 4 22 54h26l-8 42 38-54H52z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></symbol>
+    <symbol id="d-star" viewBox="0 0 100 100"><path d="M50 4c4 26 20 42 46 46-26 4-42 20-46 46-4-26-20-42-46-46 26-4 42-20 46-46z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></symbol>
+    <symbol id="d-browser" viewBox="0 0 100 100"><rect x="8" y="16" width="84" height="68" rx="6" fill="none" stroke="currentColor" stroke-width="5"/><path d="M8 34h84M20 25h.1M31 25h.1M42 25h.1M22 50h30M22 62h46M22 73h20" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></symbol>
+    <symbol id="d-gear" viewBox="0 0 100 100"><circle cx="50" cy="50" r="15" fill="none" stroke="currentColor" stroke-width="5"/><path d="M50 8v14M50 78v14M8 50h14M78 50h14M20 20l10 10M70 70l10 10M80 20 70 30M30 70 20 80" stroke="currentColor" stroke-width="7" stroke-linecap="round"/><circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" stroke-width="5"/></symbol>
+    <symbol id="d-robot" viewBox="0 0 100 100"><rect x="18" y="30" width="64" height="50" rx="10" fill="none" stroke="currentColor" stroke-width="5"/><path d="M50 30V14M44 14h12M8 52v12M92 52v12M36 78v10M64 78v10" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><circle cx="37" cy="52" r="6" fill="currentColor"/><circle cx="63" cy="52" r="6" fill="currentColor"/><path d="M38 68h24" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></symbol>
+    <symbol id="d-palm" viewBox="0 0 100 100"><path d="M52 94C50 70 50 52 54 38M54 38C40 22 24 26 10 36M54 38c-4-18 4-30 18-34M54 38c14-12 26-12 36 0M54 38c16 2 26 12 28 28M54 38C44 40 34 50 30 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></symbol>
+    <symbol id="d-arrow" viewBox="0 0 120 60"><path d="M4 40C30 8 70 6 108 30M108 30 88 22M108 30l-6 22" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="d-scribble" viewBox="0 0 200 20"><path d="M4 12C30 2 40 18 66 8s34 10 62 0 36 8 68-2" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"><span></span></div>
+
+<!-- LOADER -->
+<div class="loader" aria-hidden="true">
+  <div class="loader__stage">
+    <svg class="loader__icon is-on rough"><use href="#d-browser"/></svg>
+    <svg class="loader__icon rough"><use href="#d-gear"/></svg>
+    <svg class="loader__icon rough"><use href="#d-bolt"/></svg>
+    <svg class="loader__icon rough"><use href="#d-robot"/></svg>
+  </div>
+  <p class="loader__label hand">LOADING <b class="loader__count">0</b>%</p>
+</div>
+
+<!-- HEADER -->
+<header class="head" data-theme="dark">
+  <a class="logo" href="#top" aria-label="Foxly home">
+    <span class="logo__tag hand">WEBSITES ⚡ SOFTWARE</span>
+    <span class="logo__word brush">Foxly</span>
+  </a>
+  <button class="burger" aria-label="Open menu" aria-expanded="false" data-cursor="MENU">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- MENU -->
+<nav class="menu" aria-label="Main">
+  <ul>
+    <li><a href="#work"><i class="hand">01</i>Work</a></li>
+    <li><a href="#services"><i class="hand">02</i>Services</a></li>
+    <li><a href="#process"><i class="hand">03</i>Process</a></li>
+    <li><a href="#contact"><i class="hand">04</i>Contact</a></li>
+  </ul>
+  <p class="menu__foot hand">HELLO@FOXLY.STUDIO &nbsp;·&nbsp; REMOTE · WORLDWIDE</p>
+</nav>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero" data-theme="dark">
+    <div class="hero__scraps" aria-hidden="true">
+      <div class="scrap scrap--note" data-depth="0.4"><span class="hand">EST.<br>2020 ✦</span></div>
+      <div class="scrap scrap--pink" data-depth="0.8"><span class="brush">Ship it!</span></div>
+      <div class="scrap scrap--stamp" data-depth="0.6">
+        <svg viewBox="0 0 200 200"><defs><path id="circ" d="M100 100m-76 0a76 76 0 1 1 152 0a76 76 0 1 1-152 0"/></defs>
+          <text class="hand" font-size="19" letter-spacing="3"><textPath href="#circ">AVAILABLE FOR NEW PROJECTS ✦ AVAILABLE FOR NEW PROJECTS ✦</textPath></text>
+          <use href="#d-star" x="62" y="62" width="76" height="76"/></svg>
+      </div>
+    </div>
+
+    <h1 class="hero__title" data-split="chars">
+      WHERE CODE<br>MEETS <em class="hero__doodle"><svg class="rough"><use href="#d-bolt"/></svg></em>CRAFT.
+    </h1>
+    <p class="hero__sub hand" data-reveal>THE MIXED-MEDIA DIGITAL STUDIO BUILDING WEBSITES, SOFTWARE &amp; AUTOMATIONS FOR BRANDS THAT BITE.</p>
+    <a class="hero__scroll hand" href="#manifesto"><svg class="rough"><use href="#d-arrow"/></svg>SCROLL</a>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee__track brush">
+      <span>Websites ✺ Software ✺ Automations ✺ AI Tools ✺ Mobile Apps ✺ Dashboards ✺ </span>
+      <span>Websites ✺ Software ✺ Automations ✺ AI Tools ✺ Mobile Apps ✺ Dashboards ✺ </span>
+    </div>
+  </div>
+
+  <!-- MANIFESTO -->
+  <section class="manifesto paper" id="manifesto" data-theme="light" data-tear="#faeed9">
+    <span class="side-label hand">— THE MANIFESTO</span>
+    <p class="manifesto__text" data-scrub>We are a small crew of designers, engineers and automation nerds. We build sharp websites, custom software and tireless little robots that quietly run your business — all with a little bit of edge and a lot of care.</p>
+    <ul class="stats">
+      <li><b data-count="120">0</b><span class="hand">PROJECTS SHIPPED</span></li>
+      <li><b data-count="48">0</b><span class="hand">HAPPY CLIENTS</span></li>
+      <li><b data-count="9">0</b><span class="hand">COUNTRIES</span></li>
+      <li><b data-count="3400">0</b><span class="hand">HOURS AUTOMATED / MO</span></li>
+    </ul>
+  </section>
+
+  <!-- WORK -->
+  <section class="work" id="work" data-theme="dark" data-tear="#1a1a1a">
+    <span class="side-label hand">— THE LATEST</span>
+    <h2 class="h2" data-split="lines">SELECTED<br>WORK</h2>
+    <div class="work__grid">
+      <a class="card" href="#contact" data-cursor="VIEW" style="--c:#f25f36">
+        <div class="card__img halftone"><svg class="rough"><use href="#d-browser"/></svg><b class="brush">Marlow&nbsp;&amp;&nbsp;Co</b></div>
+        <h3>MARLOW &amp; CO — E‑COMMERCE</h3><p class="hand">WEBSITE · SHOPIFY · BRANDING</p>
+      </a>
+      <a class="card card--low" href="#contact" data-cursor="VIEW" style="--c:#2f7a72">
+        <div class="card__img halftone"><svg class="rough"><use href="#d-gear"/></svg><b class="brush">Ledgerly</b></div>
+        <h3>LEDGERLY — FINANCE DASHBOARD</h3><p class="hand">SOFTWARE · SAAS · REACT</p>
+      </a>
+      <a class="card" href="#contact" data-cursor="VIEW" style="--c:#e7a3b3">
+        <div class="card__img halftone"><svg class="rough"><use href="#d-robot"/></svg><b class="brush">Parcel&nbsp;Pilot</b></div>
+        <h3>PARCEL PILOT — LOGISTICS BOT</h3><p class="hand">AUTOMATION · AI · INTEGRATIONS</p>
+      </a>
+      <a class="card card--low" href="#contact" data-cursor="VIEW" style="--c:#6aa4c8">
+        <div class="card__img halftone"><svg class="rough"><use href="#d-bolt"/></svg><b class="brush">Nimbus</b></div>
+        <h3>NIMBUS — MOBILE APP</h3><p class="hand">APP · IOS · ANDROID</p>
+      </a>
+    </div>
+    <a class="btn" href="#contact" data-magnetic>VIEW ALL WORK</a>
+  </section>
+
+  <!-- SERVICES: pinned horizontal scroll -->
+  <section class="services" id="services" data-theme="orange" data-tear="#f25f36">
+    <div class="services__pin">
+      <div class="services__track">
+        <h2 class="h2 h2--cream">WHAT<br>WE MAKE</h2>
+        <article class="svc"><i class="hand">01</i><svg class="rough"><use href="#d-browser"/></svg><h3>Websites</h3><p>Brand sites, storefronts and landing pages that look unreal and load instantly.</p><ul class="hand"><li>DESIGN</li><li>WEBFLOW / CUSTOM</li><li>E‑COMMERCE</li></ul></article>
+        <article class="svc"><i class="hand">02</i><svg class="rough"><use href="#d-gear"/></svg><h3>Software</h3><p>Web apps, dashboards and internal tools engineered to last and easy to extend.</p><ul class="hand"><li>SAAS</li><li>PORTALS</li><li>APIS</li></ul></article>
+        <article class="svc"><i class="hand">03</i><svg class="rough"><use href="#d-robot"/></svg><h3>Automations</h3><p>We wire your tools together and let robots do the boring work — 24/7.</p><ul class="hand"><li>WORKFLOWS</li><li>AI AGENTS</li><li>INTEGRATIONS</li></ul></article>
+        <article class="svc"><i class="hand">04</i><svg class="rough"><use href="#d-bolt"/></svg><h3>Mobile Apps</h3><p>Native-feeling iOS &amp; Android apps, from prototype to App Store.</p><ul class="hand"><li>IOS</li><li>ANDROID</li><li>CROSS‑PLATFORM</li></ul></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS: stacking cards -->
+  <section class="process paper" id="process" data-theme="light" data-tear="#faeed9">
+    <span class="side-label hand">— HOW IT GOES DOWN</span>
+    <h2 class="h2" data-split="lines">OUR<br>PROCESS</h2>
+    <div class="stack">
+      <article class="step" style="--bg:#faeed9;--r:-1.2deg"><i class="hand">STEP 01</i><h3>DISCOVER</h3><p>We dig into your goals, users and mess. Workshops, audits and a sharp plan.</p><svg class="rough"><use href="#d-star"/></svg></article>
+      <article class="step" style="--bg:#e7a3b3;--r:1deg"><i class="hand">STEP 02</i><h3>DESIGN</h3><p>Wireframes, brand, motion — tactile, bold and unmistakably yours.</p><svg class="rough"><use href="#d-palm"/></svg></article>
+      <article class="step" style="--bg:#d9dc7a;--r:-0.8deg"><i class="hand">STEP 03</i><h3>BUILD</h3><p>Clean, tested code shipped in weekly slices so you see progress fast.</p><svg class="rough"><use href="#d-gear"/></svg></article>
+      <article class="step" style="--bg:#f25f36;--r:1.3deg;color:#faeed9"><i class="hand">STEP 04</i><h3>LAUNCH</h3><p>Go live, measure, automate the rest. We stick around after the confetti.</p><svg class="rough"><use href="#d-bolt"/></svg></article>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <section class="quote" data-theme="pink" data-tear="#e7a3b3">
+    <blockquote data-split="lines">“They shipped in six weeks what our last agency couldn’t in six months — and it looks incredible.”</blockquote>
+    <p class="hand" data-reveal>— FOUNDER, MARLOW &amp; CO</p>
+  </section>
+
+  <!-- CONTACT / FOOTER -->
+  <footer class="contact" id="contact" data-theme="dark" data-tear="#1a1a1a">
+    <h2 class="contact__title" data-split="chars">LET’S MAKE<br>SOMETHING<br>LOUD.</h2>
+    <a class="btn btn--big" href="mailto:hello@foxly.studio" data-magnetic>HELLO@FOXLY.STUDIO</a>
+    <div class="foot hand">
+      <span>REMOTE · WORLDWIDE</span>
+      <nav><a href="#work">WORK</a><a href="#services">SERVICES</a><a href="#process">PROCESS</a><a href="#contact">CONTACT</a></nav>
+      <span>© 2026 FOXLY STUDIO</span>
+    </div>
+  </footer>
+</main>
+
+</body>
+</html>
