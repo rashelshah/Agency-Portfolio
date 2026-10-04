@@ -97,6 +97,7 @@ section { position: relative; }
 
 /* ---------- hero ---------- */
 .hero { min-height: 100svh; display: grid; place-content: center; justify-items: center; text-align: center; padding: 150px var(--pad) 120px; overflow: hidden; }
+.hero__title, .h2, .contact__title, .step h3 { filter: url(#ink); -webkit-backface-visibility: hidden; backface-visibility: hidden; transform: translateZ(0); }
 
 .hero__title { font: 400 clamp(40px, 8.8vw, 150px)/.95 var(--display); color: var(--orange); letter-spacing: -.015em; position: relative; z-index: 2; }
 .hero__title { white-space: nowrap; }
