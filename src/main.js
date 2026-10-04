@@ -199,6 +199,35 @@ function init() {
       onToggle: (self) => self.isActive && (head.className = "head is-" + s.dataset.theme),
     })
   );
+
+  /* clients: stamp-in cards, parallax, tilt, drawn scribble, tickers */
+  const clientCards = $$(".cl__card");
+  ScrollTrigger.batch(clientCards, {
+    start: "top 88%", once: true,
+    onEnter: (els) => els.forEach((el, i) => {
+      const r = rnd(-14, 14);
+      gsap.timeline({ delay: i * 0.12 })
+        .fromTo(el, { scale: 1.8, opacity: 0, rotation: r, "--k": 0 }, { scale: 1, opacity: 1, rotation: 0, "--k": 1, duration: 0.42, ease: "power4.in" })               // slam down
+        .to(el, { x: "+=5", y: "+=3", duration: 0.04, repeat: 5, yoyo: true, ease: "none" })                                                                         // impact shake
+        .fromTo($(".cl__ico", el), { scale: 0, rotation: -40 }, { scale: 1, rotation: 0, duration: 0.7, ease: "back.out(2.4)" }, "-=.25");
+    }),
+  });
+  gsap.set(clientCards, { opacity: 0 });
+  $$(".cl").forEach((el) => gsap.fromTo(el, { y: +el.dataset.speed }, { y: -el.dataset.speed, ease: "none", scrollTrigger: { trigger: ".clients__grid", start: "top bottom", end: "bottom top", scrub: true } }));
+  if (matchMedia("(hover: hover)").matches)
+    clientCards.forEach((el) => {
+      const rx = gsap.quickTo(el, "rotationX", { duration: 0.5, ease: "power3" }), ry = gsap.quickTo(el, "rotationY", { duration: 0.5, ease: "power3" });
+      gsap.set(el, { transformPerspective: 800 });
+      el.addEventListener("mousemove", (e) => { const b = el.getBoundingClientRect(); ry(((e.clientX - b.left) / b.width - 0.5) * 14); rx(-((e.clientY - b.top) / b.height - 0.5) * 12); });
+      el.addEventListener("mouseleave", () => (rx(0), ry(0)));
+    });
+  const scrib = $(".clients__scribble path"), sl = scrib.getTotalLength();
+  gsap.set(scrib, { strokeDasharray: sl, strokeDashoffset: sl });
+  gsap.to(scrib, { strokeDashoffset: 0, duration: 1.2, ease: "power2.inOut", scrollTrigger: { trigger: ".clients__scribble", start: "top 88%" } });
+  [[".ticker--a", -1], [".ticker--b", 1]].forEach(([sel, dir]) => {
+    const t = $(".ticker__track", $(sel)), tw = gsap.fromTo(t, { xPercent: dir > 0 ? -50 : 0 }, { xPercent: dir > 0 ? 0 : -50, ease: "none", duration: 34, repeat: -1 });
+    ScrollTrigger.create({ trigger: sel, start: "top bottom", end: "bottom top", onUpdate: (s) => { tw.timeScale(1 + Math.min(Math.abs(s.getVelocity()) / 250, 5) * (s.direction === 1 ? 1 : -1) * 1); gsap.to(tw, { timeScale: 1, duration: 0.9, overwrite: true }); } });
+  });
   ScrollTrigger.refresh();
 }
 

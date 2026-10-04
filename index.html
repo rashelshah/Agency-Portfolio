@@ -114,10 +114,12 @@
   </section>
 
   <!-- MARQUEE -->
-  <div class="marquee" aria-hidden="true">
-    <div class="marquee__track brush">
-      <span>Websites ✺ Software ✺ Automations ✺ AI Tools ✺ Mobile Apps ✺ Dashboards ✺ </span>
-      <span>Websites ✺ Software ✺ Automations ✺ AI Tools ✺ Mobile Apps ✺ Dashboards ✺ </span>
+  <div class="marquee-wrapper" style="overflow: hidden; width: 100%; position: relative;">
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee__track brush">
+        <span>Websites ✺ Software ✺ Automations ✺ AI Tools ✺ Mobile Apps ✺ Dashboards ✺ </span>
+        <span>Websites ✺ Software ✺ Automations ✺ AI Tools ✺ Mobile Apps ✺ Dashboards ✺ </span>
+      </div>
     </div>
   </div>
 
@@ -173,17 +175,53 @@
   <!-- CLIENTS -->
   <section class="clients paper" id="clients" data-theme="light" data-tear="#faeed9">
     <span class="side-label hand">— WHO WE HELP</span>
-    <h2 class="h2" data-split="lines">SELECTED<br>CLIENTS</h2>
-    <div class="clients__grid" data-reveal>
-      <div class="client-logo"><h3 class="brush">Y Combinator</h3></div>
-      <div class="client-logo"><h3 class="brush">Stripe</h3></div>
-      <div class="client-logo"><h3 class="brush">OpenAI</h3></div>
-      <div class="client-logo"><h3 class="brush">Framer</h3></div>
-      <div class="client-logo"><h3 class="brush">Vercel</h3></div>
-      <div class="client-logo"><h3 class="brush">Shopify</h3></div>
-      <div class="client-logo"><h3 class="brush">Linear</h3></div>
-      <div class="client-logo"><h3 class="brush">Notion</h3></div>
+    <svg class="clients__bolt rough" aria-hidden="true"><use href="#d-bolt"/></svg>
+    <svg class="clients__star rough" aria-hidden="true"><use href="#d-star"/></svg>
+    <div class="clients__head">
+      <h2 class="h2" data-split="lines">SELECTED<br>CLIENTS</h2>
+      <p class="clients__note hand" data-reveal>TEAMS WE'VE BUILT, BROKEN &amp; SHIPPED WITH. 06 OF THEM, ALL STILL TALKING TO US.</p>
     </div>
+    <svg class="clients__scribble" viewBox="0 0 520 26" aria-hidden="true"><path d="M4 16C60 4 90 24 150 12S250 2 310 14 430 24 516 8" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg>
+    <div class="clients__grid">
+      <div class="cl" data-speed="-30"><div class="cl__card" style="--c:#f25f36;--r:-2.2deg" data-tone="cream" data-cursor="CLIENT">
+        <span class="cl__no hand">Nº 01</span>
+        <svg class="cl__ico rough"><use href="#d-browser"/></svg>
+        <h3 class="cl__name">Tubelight Mediaworks</h3>
+        <span class="cl__stamp hand">TRUSTED ✦</span>
+      </div></div>
+      <div class="cl" data-speed="40"><div class="cl__card" style="--c:#e7a3b3;--r:1.6deg" data-tone="ink" data-cursor="CLIENT">
+        <span class="cl__no hand">Nº 02</span>
+        <svg class="cl__ico rough"><use href="#d-star"/></svg>
+        <h3 class="cl__name">Redfox Digital</h3>
+        <span class="cl__stamp hand">TRUSTED ✦</span>
+      </div></div>
+      <div class="cl" data-speed="-20"><div class="cl__card" style="--c:#d9dc7a;--r:-1.2deg" data-tone="ink" data-cursor="CLIENT">
+        <span class="cl__no hand">Nº 03</span>
+        <svg class="cl__ico rough"><use href="#d-gear"/></svg>
+        <h3 class="cl__name">KaizenStat</h3>
+        <span class="cl__stamp hand">TRUSTED ✦</span>
+      </div></div>
+      <div class="cl" data-speed="30"><div class="cl__card" style="--c:#2f7a72;--r:2.2deg" data-tone="cream" data-cursor="CLIENT">
+        <span class="cl__no hand">Nº 04</span>
+        <svg class="cl__ico rough"><use href="#d-bolt"/></svg>
+        <h3 class="cl__name">Tubelight Sports</h3>
+        <span class="cl__stamp hand">TRUSTED ✦</span>
+      </div></div>
+      <div class="cl" data-speed="-40"><div class="cl__card" style="--c:#1a1a1a;--r:-1.8deg" data-tone="cream" data-cursor="CLIENT">
+        <span class="cl__no hand">Nº 05</span>
+        <svg class="cl__ico rough"><use href="#d-robot"/></svg>
+        <h3 class="cl__name">Forge</h3>
+        <span class="cl__stamp hand">TRUSTED ✦</span>
+      </div></div>
+      <div class="cl" data-speed="20"><div class="cl__card" style="--c:#faeed9;--r:1.2deg" data-tone="ink" data-cursor="CLIENT">
+        <span class="cl__no hand">Nº 06</span>
+        <svg class="cl__ico rough"><use href="#d-palm"/></svg>
+        <h3 class="cl__name">Crypton AI</h3>
+        <span class="cl__stamp hand">TRUSTED ✦</span>
+      </div></div>
+    </div>
+    <div class="ticker ticker--a" aria-hidden="true"><div class="ticker__track hand"><span>TUBELIGHT MEDIAWORKS ✺ REDFOX DIGITAL ✺ KAIZENSTAT ✺ TUBELIGHT SPORTS ✺ FORGE ✺ CRYPTON AI ✺ </span><span>TUBELIGHT MEDIAWORKS ✺ REDFOX DIGITAL ✺ KAIZENSTAT ✺ TUBELIGHT SPORTS ✺ FORGE ✺ CRYPTON AI ✺ </span></div></div>
+    <div class="ticker ticker--b" aria-hidden="true"><div class="ticker__track hand"><span>TUBELIGHT MEDIAWORKS ✺ REDFOX DIGITAL ✺ KAIZENSTAT ✺ TUBELIGHT SPORTS ✺ FORGE ✺ CRYPTON AI ✺ </span><span>TUBELIGHT MEDIAWORKS ✺ REDFOX DIGITAL ✺ KAIZENSTAT ✺ TUBELIGHT SPORTS ✺ FORGE ✺ CRYPTON AI ✺ </span></div></div>
   </section>
 
   <!-- SERVICES: pinned horizontal scroll -->
