@@ -125,7 +125,7 @@ section { position: relative; }
 
 /* ---------- manifesto ---------- */
 .manifesto { padding: clamp(150px, 20vw, 280px) var(--pad) 140px calc(var(--pad) + 40px); }
-.manifesto__text { max-width: 1100px; font: 400 clamp(30px, 4.6vw, 68px)/1.08 var(--display); text-transform: uppercase; letter-spacing: -.01em; }
+.manifesto__text { max-width: 900px; font: 400 clamp(24px, 3.5vw, 52px)/1.2 var(--hand-f); text-transform: uppercase; letter-spacing: .04em; }
 .manifesto__text .w { opacity: .14; }
 .stats { margin-top: 110px; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 30px; }
 .stats li { border-top: 3px solid var(--ink); padding-top: 14px; }
@@ -168,11 +168,11 @@ section { position: relative; }
 .process { padding: clamp(110px, 14vw, 200px) var(--pad) 40px calc(var(--pad) + 40px); }
 .process .h2 { margin-bottom: 60px; }
 .stack { padding-bottom: 20vh; }
-.step { position: sticky; top: calc(14vh + var(--i, 0) * 26px); min-height: 52vh; margin-bottom: 14vh; max-width: 1000px; padding: clamp(26px, 4vw, 56px); background: var(--bg); color: var(--ink); border: 3px solid var(--ink); border-radius: 6px; rotate: var(--r); box-shadow: 10px 12px 0 rgba(250,238,217,.14); transform-origin: 50% 0; display: grid; align-content: start; }
-.step i { font: 400 22px var(--hand-f); font-style: normal; }
-.step h3 { font: 400 clamp(54px, 9vw, 140px)/.95 var(--display); margin: 8px 0 14px; }
-.step p { max-width: 520px; font-size: clamp(18px, 1.7vw, 24px); }
-.step svg { position: absolute; right: 5%; bottom: 8%; width: clamp(90px, 14vw, 200px); aspect-ratio: 1; opacity: .9; }
+.step { position: sticky; top: calc(14vh + var(--i, 0) * 26px); min-height: 40vh; margin-bottom: 10vh; max-width: 840px; padding: clamp(20px, 3vw, 44px); background: var(--bg); color: var(--ink); border: 3px solid var(--ink); border-radius: 6px; rotate: var(--r); box-shadow: 10px 12px 0 rgba(250,238,217,.14); transform-origin: 50% 0; display: grid; align-content: start; }
+.step i { font: 400 18px var(--hand-f); font-style: normal; }
+.step h3 { font: 400 clamp(42px, 7vw, 100px)/.95 var(--display); margin: 6px 0 10px; }
+.step p { max-width: 480px; font-size: clamp(16px, 1.4vw, 20px); }
+.step svg { position: absolute; right: 5%; bottom: 8%; width: clamp(70px, 10vw, 140px); aspect-ratio: 1; opacity: .9; }
 
 /* ---------- quote ---------- */
 .quote { background-color: var(--pink); color: var(--ink); padding: clamp(120px, 15vw, 220px) var(--pad) clamp(110px, 12vw, 180px); text-align: center; }
@@ -195,7 +195,7 @@ section { position: relative; }
   .scrap--pink { font-size: 28px; padding: 8px 18px; right: 4%; top: 14%; }
   .scrap--stamp { width: 96px; height: 96px; bottom: 6%; right: 4%; }
   .logo__word { font-size: 36px; }
-  .step { min-height: 44vh; }
+  .step { min-height: 34vh; }
   .svc:nth-child(even) { margin-top: 0; }
   .foot { justify-content: center; text-align: center; }
 }
