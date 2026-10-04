@@ -105,7 +105,7 @@ function runLoader() {
     gsap.fromTo(iconSets.map((s) => s[i]), { rotate: -8, scale: 0.9 }, { rotate: 0, scale: 1, duration: 0.3, ease: "back.out(3)" });
   }, 480);
 
-  const finish = () => { if (sessionStorage.dbgHold) return; $(".loader").remove(); }; // DEBUG
+  const finish = () => $(".loader").remove();
   const num = { v: 0 };
   const tl = gsap.timeline({ delay: 0.2 });
   tl.to(num, { v: 100, duration: reduced ? 0.1 : 2.2, ease: "power1.inOut", onUpdate: () => counts.forEach((c) => (c.textContent = Math.round(num.v))) })
@@ -119,7 +119,6 @@ function runLoader() {
         const ease = "cubic-bezier(.95,.05,.795,.035)";
         top.animate([{ transform: "translateY(0)" }, { transform: "translateY(-100%)" }], { duration: 1000, easing: ease, fill: "forwards" });
         bottom.animate([{ transform: "translateY(0)" }, { transform: "translateY(100%)" }], { duration: 1000, easing: ease, fill: "forwards" });
-        window.__a = document.getAnimations(); // DEBUG
         document.body.classList.remove("is-loading");
         lenis?.start();
         setTimeout(intro, 650);
@@ -345,65 +344,53 @@ const PROJECTS = [
 
   const ui = () => [".viewer__head", ".viewer__close", ".viewer__nav", ".viewer__play"];
 
-  // Split wipe: a solid centre block plus two frayed dry-brush edge sprites. The block and sprites only move
-  // (mask-position/size), so nothing is re-decoded per frame -> no flicker. Opens from the middle, sweeps sideways.
-  const SW = 170, SH = 1024, EDGE = 28;
-  const halo = $(".viewer-halo");
-  let sprites = null, spritesReady = null;
-  // One side of the wipe. Opaque body on the left, a dry-brush fringe to the right: thin bristle streaks of varying length,
-  // broken into dashes, plus loose flecks beyond the edge. makeSprite(true) mirrors it for the other side.
-  const makeSprite = (flip) => {
-    const c = document.createElement("canvas"); c.width = SW; c.height = SH;
-    const ctx = c.getContext("2d"), img = ctx.createImageData(SW, SH), px = img.data;
-    const ph = Array.from({ length: 6 }, () => rnd(0, 6.283));
-    // bristle length per row: heavy-tailed, correlated with the row above so strands read as streaks, not bars
-    const L = new Float32Array(SH); let prev = 0;
-    for (let y = 0; y < SH; y++) { const fresh = Math.pow(Math.random(), 3) * 74; prev = Math.random() < 0.35 ? fresh : prev * 0.82 + fresh * 0.18; L[y] = prev; }
-    const set = (x, y, a) => { if (x < 0 || x >= SW) return; const X = flip ? SW - 1 - x : x, i = (y * SW + X) * 4; px[i] = px[i + 1] = px[i + 2] = 255; px[i + 3] = Math.max(px[i + 3], a * 255); };
-    for (let y = 0; y < SH; y++) {
-      let wob = 0; for (let k = 1; k <= 6; k++) wob += (11 / k) * Math.sin((6.283185 * k * y) / SH + ph[k - 1]);
-      const body = Math.max(6, EDGE + wob + rnd(-2, 2));          // solid paper
-      const reach = body + L[y];                                  // end of this row's bristle
-      for (let x = 0; x < body; x++) set(x, y, 1);
-      // fringe as dry-brush dashes: alternating paint / gap runs that get sparser towards the tip
-      let x = body, on = true;
-      while (x < reach) {
-        const run = on ? 3 + Math.random() * 12 : 2 + Math.random() * 9, t = (x - body) / Math.max(1, reach - body);
-        if (on && Math.random() > t * 0.55) for (let j = 0; j < run && x + j < reach; j++) set(Math.floor(x + j), y, 1 - t * 0.35);
-        x += run; on = !on;
-      }
+  /* ---- vertical slice transition (the intro's slice, turned 90deg): a slanted torn seam draws top -> bottom, then the
+     page splits along it; left half slides left, right half slides right. Close runs it back together and apart again. ---- */
+  const sliceEl = $(".slice"), [sL, sR, sC] = $$(".slice__layer", sliceEl);
+  let maskKey = "";
+  const prepMasks = () => {
+    const w = innerWidth, h = innerHeight, key = w + "x" + h;
+    if (key === maskKey) return;
+    maskKey = key;
+    const gap = Math.max(2, Math.round(w / 300)), edge = new Float32Array(h), p1 = rnd(0, 6), p2 = rnd(0, 6), p3 = rnd(0, 6);
+    for (let y = 0; y < h; y++) {
+      const t = y / h; // seam leans from upper-right to lower-left
+      edge[y] = w * (0.64 - 0.28 * t) + Math.sin(t * 9 + p1) * w * 0.016 + Math.sin(t * 23 + p2) * w * 0.005 + Math.sin(t * 61 + p3) * 2 + rnd(-1.6, 1.6) + (Math.random() < 0.02 ? rnd(-4, 4) : 0);
     }
-    for (let n = 0; n < 150; n++) { const y = Math.floor(rnd(0, SH)), x = Math.floor(EDGE + rnd(10, SW - EDGE - 12)); const s = Math.random() < 0.3 ? 2 : 1; for (let dy = 0; dy < s; dy++) for (let dx = 0; dx < s + 1; dx++) set(x + dx, (y + dy) % SH, 0.9); } // flecks
-    ctx.putImageData(img, 0, 0);
-    return c.toDataURL("image/png");
-  };
-  function buildMask() {
-    if (spritesReady) return spritesReady;
-    spritesReady = new Promise((resolve) => {
-      const R = makeSprite(false), L = makeSprite(true);
-      let n = 0; [R, L].forEach((u) => { const im = new Image(); im.onload = im.onerror = () => ++n === 2 && ((sprites = { R: `url(${R})`, L: `url(${L})` }), resolve()); im.src = u; });
-    });
-    return spritesReady;
-  }
-  const setMask = (el, s) => {
-    const cx = innerWidth / 2, blockW = Math.max(0, s * 2);
-    const css = {
-      maskImage: `linear-gradient(#000,#000), ${sprites.R}, ${sprites.L}`,
-      maskSize: `${blockW}px 100%, ${SW}px ${SH}px, ${SW}px ${SH}px`,
-      maskPosition: `${cx - s}px 0, ${cx + s - EDGE}px 0, ${cx - s - (SW - EDGE)}px 0`,
-      maskRepeat: "no-repeat, repeat-y, repeat-y",
+    const make = (left) => {
+      const c = document.createElement("canvas"); c.width = w; c.height = h;
+      const g = c.getContext("2d"); g.fillStyle = "#000"; g.beginPath();
+      if (left) { g.moveTo(0, 0); g.lineTo(0, h); for (let y = h - 1; y >= 0; y--) g.lineTo(edge[y], y); }
+      else { g.moveTo(w, 0); g.lineTo(w, h); for (let y = h - 1; y >= 0; y--) g.lineTo(edge[y] + gap, y); }
+      g.closePath(); g.fill();
+      return `url(${c.toDataURL("image/png")})`;
     };
-    for (const k in css) { el.style[k] = css[k]; el.style["webkit" + k[0].toUpperCase() + k.slice(1)] = css[k]; }
+    const [ml, mr] = [make(true), make(false)];
+    sL.style.maskImage = sL.style.webkitMaskImage = ml;
+    sR.style.maskImage = sR.style.webkitMaskImage = mr;
   };
-  const clearMask = (el) => { el.style.maskImage = el.style.webkitMaskImage = "none"; };
-  const sMax = () => innerWidth / 2 + 60;
-  const paint = (p) => {
-    const s = sMax() * p;
-    if (p >= 1) { clearMask(v); halo.style.visibility = "hidden"; return; }
-    setMask(v, s); setMask(halo, s + 34); halo.style.visibility = "visible";
+  const EASE_IN = "cubic-bezier(.95,.05,.795,.035)", EASE_OUT = "cubic-bezier(.205,.965,.05,.95)", FULL = "polygon(0 0,100% 0,100% 100%,0 100%)", GONE = "polygon(0 100%,100% 100%,100% 100%,0 100%)";
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const anim = (el, kf, o) => el.animate(kf, { fill: "forwards", ...o }).finished;
+  const prepSlice = (i, closing) => {
+    sliceEl.getAnimations({ subtree: true }).forEach((a) => a.cancel());
+    prepMasks();
+    // opening starts as a full cream sheet; closing starts with the halves parked off-screen
+    sL.style.transform = closing ? "translateX(-100%)" : ""; sR.style.transform = closing ? "translateX(100%)" : "";
+    sC.style.clipPath = closing ? GONE : ""; sliceEl.style.opacity = closing ? 1 : 0;
+    const p = PROJECTS[i];
+    $$(".slice__layer", sliceEl).forEach((l) => { $("svg use", l).setAttribute("href", "#" + p.icon); $("b", l).textContent = p.name; });
+    sliceEl.style.visibility = "visible"; sliceEl.style.pointerEvents = "auto";
   };
-  const draw = (o) => paint(o.p);
-  (window.requestIdleCallback || setTimeout)(() => buildMask());
+  const apart = () => Promise.all([
+    anim(sL, [{ transform: "translateX(0)" }, { transform: "translateX(-100%)" }], { duration: 900, easing: EASE_IN }),
+    anim(sR, [{ transform: "translateX(0)" }, { transform: "translateX(100%)" }], { duration: 900, easing: EASE_IN }),
+  ]);
+  const together = () => Promise.all([
+    anim(sL, [{ transform: "translateX(-100%)" }, { transform: "translateX(0)" }], { duration: 800, easing: EASE_OUT }),
+    anim(sR, [{ transform: "translateX(100%)" }, { transform: "translateX(0)" }], { duration: 800, easing: EASE_OUT }),
+  ]);
+  const endSlice = () => { sliceEl.style.visibility = "hidden"; sliceEl.style.pointerEvents = "none"; sliceEl.getAnimations({ subtree: true }).forEach((a) => a.cancel()); };
 
   async function open(i, card) {
     if (isOpen || busy) return;
@@ -411,34 +398,36 @@ const PROJECTS = [
     fill(i);
     v.scrollTop = 0;
     lenis?.stop();
-    await buildMask();
-    const o = { p: 0 };
-    draw(o);
-    gsap.set([v, halo], { visibility: "visible", opacity: 1 });
+    gsap.set(v, { visibility: "visible", opacity: 1 });
     gsap.set(ui(), { opacity: 0 });
-    gsap.timeline({ onComplete: () => { clearMask(v); gsap.set(halo, { visibility: "hidden" }); busy = false; } })
-      .to(o, { p: 1, duration: 1.2, ease: "power2.inOut", onUpdate: () => draw(o) })
-      .fromTo($("b", media), { yPercent: 50, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.9, ease: "power3.out" }, 0.7)
-      .fromTo(title, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power4.out" }, 0.85)
-      .to(".viewer__head", { opacity: 1, duration: 0.01 }, 0.84)
-      .fromTo(dir, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6 }, 1.05)
-      .fromTo(".viewer__close", { scale: 0, rotate: -90 }, { scale: 1, rotate: 0, opacity: 1, duration: 0.6, ease: "back.out(2)" }, 1.0)
-      .fromTo(".viewer__play", { scale: 0 }, { scale: 1, opacity: 1, duration: 0.7, ease: "back.out(2)" }, 1.1)
-      .fromTo(".viewer__nav", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 }, 1.15);
     v.setAttribute("aria-hidden", "false");
+    prepSlice(i, false);
+    await anim(sliceEl, [{ opacity: 0 }, { opacity: 1 }], { duration: 160 });          // cream sheet drops over the page
+    await wait(120);
+    await anim(sC, [{ clipPath: FULL }, { clipPath: GONE }], { duration: 700, easing: "cubic-bezier(.333,1,.666,1)" }); // seam draws top -> bottom
+    const slide = apart();                                                             // page splits left / right
+    await wait(520);
+    gsap.timeline({ onComplete: () => (busy = false) })
+      .fromTo($("b", media), { yPercent: 50, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.9, ease: "power3.out" }, 0)
+      .fromTo(title, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: "power4.out" }, 0.1)
+      .to(".viewer__head", { opacity: 1, duration: 0.01 }, 0.09)
+      .fromTo(dir, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6 }, 0.3)
+      .fromTo(".viewer__close", { scale: 0, rotate: -90 }, { scale: 1, rotate: 0, opacity: 1, duration: 0.6, ease: "back.out(2)" }, 0.25)
+      .fromTo(".viewer__play", { scale: 0 }, { scale: 1, opacity: 1, duration: 0.7, ease: "back.out(2)" }, 0.35)
+      .fromTo(".viewer__nav", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6 }, 0.4);
+    await slide; endSlice();
   }
 
-  function close() {
+  async function close() {
     if (!isOpen || busy) return;
     busy = true;
-    const o = { p: 1 };
-    draw(o);
-    gsap.set(halo, { visibility: "visible" });
-    gsap.timeline({ onComplete: () => { gsap.set([v, halo], { visibility: "hidden" }); isOpen = busy = false; lenis?.start(); v.setAttribute("aria-hidden", "true"); } })
-      .to(ui(), { opacity: 0, duration: 0.25 })
-      .add(() => v.scrollTo({ top: 0 }))
-      .to(o, { p: 0, duration: 0.95, ease: "power2.inOut", onUpdate: () => draw(o) })
-      .to([v, halo], { opacity: 0, duration: 0.12 });
+    await gsap.to(ui(), { opacity: 0, duration: 0.2 }).then();
+    prepSlice(cur, true);
+    await together();                                                                  // halves meet over the project
+    v.scrollTo({ top: 0 }); gsap.set(v, { visibility: "hidden" }); v.setAttribute("aria-hidden", "true");
+    await wait(140);
+    await apart();                                                                     // and split again, revealing the page
+    endSlice(); isOpen = busy = false; lenis?.start();
   }
 
   function go(dirn) {
@@ -457,7 +446,7 @@ const PROJECTS = [
   $(".viewer__prev").addEventListener("click", () => go(-1));
   $(".viewer__next").addEventListener("click", () => go(1));
   $(".viewer__play").addEventListener("click", () => v.scrollTo({ top: innerHeight, behavior: "smooth" }));
-  $(".vd__cta").addEventListener("click", () => { close(); setTimeout(() => scrollTo("#contact"), 1100); });
+  $(".vd__cta").addEventListener("click", async () => { await close(); scrollTo("#contact"); });
   addEventListener("keydown", (e) => { if (!isOpen) return; if (e.key === "Escape") close(); if (e.key === "ArrowRight") go(1); if (e.key === "ArrowLeft") go(-1); });
 
   // story section reveals as the viewer scrolls
