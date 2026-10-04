@@ -97,7 +97,7 @@ section { position: relative; }
 
 /* ---------- hero ---------- */
 .hero { min-height: 100svh; display: grid; place-content: center; justify-items: center; text-align: center; padding: 150px var(--pad) 120px; overflow: hidden; }
-.hero__title, .h2, .contact__title, .step h3 { filter: url(#ink); }
+
 .hero__title { font: 400 clamp(40px, 8.8vw, 150px)/.95 var(--display); color: var(--orange); letter-spacing: -.015em; position: relative; z-index: 2; }
 .hero__title { white-space: nowrap; }
 @media (max-width: 640px) { .hero__title { font-size: 12.5vw; white-space: normal; } }
@@ -168,7 +168,7 @@ section { position: relative; }
 .process { padding: clamp(110px, 14vw, 200px) var(--pad) 40px calc(var(--pad) + 40px); }
 .process .h2 { margin-bottom: 60px; }
 .stack { padding-bottom: 20vh; }
-.step { position: sticky; top: calc(14vh + var(--i, 0) * 26px); min-height: 52vh; margin-bottom: 14vh; max-width: 1000px; padding: clamp(26px, 4vw, 56px); background: var(--bg); color: inherit; border: 3px solid var(--ink); border-radius: 6px; rotate: var(--r); box-shadow: 10px 12px 0 rgba(250,238,217,.14); transform-origin: 50% 0; display: grid; align-content: start; }
+.step { position: sticky; top: calc(14vh + var(--i, 0) * 26px); min-height: 52vh; margin-bottom: 14vh; max-width: 1000px; padding: clamp(26px, 4vw, 56px); background: var(--bg); color: var(--ink); border: 3px solid var(--ink); border-radius: 6px; rotate: var(--r); box-shadow: 10px 12px 0 rgba(250,238,217,.14); transform-origin: 50% 0; display: grid; align-content: start; }
 .step i { font: 400 22px var(--hand-f); font-style: normal; }
 .step h3 { font: 400 clamp(54px, 9vw, 140px)/.95 var(--display); margin: 8px 0 14px; }
 .step p { max-width: 520px; font-size: clamp(18px, 1.7vw, 24px); }

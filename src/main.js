@@ -188,7 +188,7 @@ function init() {
   steps.forEach((s, i) => {
     s.style.setProperty("--i", i);
     if (i < steps.length - 1)
-      gsap.to(s, { scale: 0.92, filter: "brightness(.82)", ease: "none", scrollTrigger: { trigger: steps[i + 1], start: "top 92%", end: "top 24%", scrub: true } });
+      gsap.to(s, { scale: 0.92, ease: "none", scrollTrigger: { trigger: steps[i + 1], start: "top 92%", end: "top 24%", scrub: true } });
   });
 
   /* header colour follows the section underneath */
