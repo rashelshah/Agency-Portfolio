@@ -50,13 +50,6 @@ function ripClip(el, amp = 1.1, n = 14) {
   el.style.clipPath = `polygon(${[...t, ...r, ...b, ...l].join(",")})`;
 }
 $$(".card__img").forEach((el) => ripClip(el));
-{
-  // loader's torn bottom edge lives in its extra 46px
-  const l = $(".loader");
-  const bottom = Array.from({ length: 61 }, (_, i) => `${100 - (i / 60) * 100}% calc(100% - ${rnd(0, 40).toFixed(1)}px)`);
-  l.style.clipPath = `polygon(0 0,100% 0,${bottom.join(",")})`;
-}
-
 /* ---------- ink-bleed "boil" on hand-drawn bits ---------- */
 if (!reduced) {
   const noise = $("#rough-noise");
@@ -78,28 +71,61 @@ const scrollTo = (target, opts) => (lenis ? lenis.scrollTo(target, { duration: 1
 document.body.classList.add("is-loading");
 lenis?.stop();
 
+// Slanted, torn slice line (rises left -> right). Top mask is opaque above it, bottom mask below it with a hairline gap
+// so the dark site shows through as the black seam. Both are generated at the viewport size.
+function sliceMasks() {
+  const w = innerWidth, h = innerHeight, gap = Math.max(2, Math.round(h / 300));
+  const edge = new Float32Array(w), p1 = rnd(0, 6), p2 = rnd(0, 6), p3 = rnd(0, 6);
+  for (let x = 0; x < w; x++) {
+    const t = x / w;
+    edge[x] = h * (0.64 - 0.26 * t) + Math.sin(t * 9 + p1) * h * 0.018 + Math.sin(t * 23 + p2) * h * 0.006 + Math.sin(t * 61 + p3) * 2 + rnd(-1.6, 1.6) + (Math.random() < 0.02 ? rnd(-4, 4) : 0);
+  }
+  const make = (top) => {
+    const c = document.createElement("canvas"); c.width = w; c.height = h;
+    const g = c.getContext("2d"); g.fillStyle = "#000";
+    g.beginPath();
+    if (top) { g.moveTo(0, 0); g.lineTo(w, 0); for (let x = w - 1; x >= 0; x--) g.lineTo(x, edge[x]); }
+    else { g.moveTo(0, h); g.lineTo(w, h); for (let x = w - 1; x >= 0; x--) g.lineTo(x, edge[x] + gap); }
+    g.closePath(); g.fill();
+    return `url(${c.toDataURL("image/png")})`;
+  };
+  return [make(true), make(false)];
+}
+
 function runLoader() {
-  const icons = $$(".loader__icon");
-  const count = $(".loader__count");
+  const layers = $$(".loader__layer"), [top, bottom, cover] = layers;
+  const [mTop, mBottom] = sliceMasks();
+  top.style.maskImage = top.style.webkitMaskImage = mTop;
+  bottom.style.maskImage = bottom.style.webkitMaskImage = mBottom;
+  const iconSets = layers.map((l) => $$(".loader__icon", l)), counts = $$(".loader__count");
   let i = 0;
   const cycle = setInterval(() => {
-    icons[i].classList.remove("is-on");
-    icons[(i = (i + 1) % icons.length)].classList.add("is-on");
-    gsap.fromTo(icons[i], { rotate: -8, scale: 0.9 }, { rotate: 0, scale: 1, duration: 0.3, ease: "back.out(3)" });
+    const prev = i; i = (i + 1) % iconSets[0].length;
+    iconSets.forEach((set) => { set[prev].classList.remove("is-on"); set[i].classList.add("is-on"); });
+    gsap.fromTo(iconSets.map((s) => s[i]), { rotate: -8, scale: 0.9 }, { rotate: 0, scale: 1, duration: 0.3, ease: "back.out(3)" });
   }, 480);
 
+  const finish = () => { if (sessionStorage.dbgHold) return; $(".loader").remove(); }; // DEBUG
   const num = { v: 0 };
   const tl = gsap.timeline({ delay: 0.2 });
-  tl.to(num, { v: 100, duration: reduced ? 0.1 : 2.2, ease: "power1.inOut", onUpdate: () => (count.textContent = Math.round(num.v)) })
+  tl.to(num, { v: 100, duration: reduced ? 0.1 : 2.2, ease: "power1.inOut", onUpdate: () => counts.forEach((c) => (c.textContent = Math.round(num.v))) })
     .add(() => {
       clearInterval(cycle);
-      document.body.classList.remove("is-loading");
-      lenis?.start();
-    })
-    .to(".loader__stage, .loader__label", { y: -30, opacity: 0, duration: 0.4, ease: "power2.in" })
-    .to(".loader", { yPercent: -102, duration: 1.1, ease: "power4.inOut" }, "-=.1")
-    .add(intro, "-=.55")
-    .set(".loader", { display: "none" });
+      if (reduced) { document.body.classList.remove("is-loading"); lenis?.start(); finish(); intro(); return; }
+      // 1) the cover layer wipes off left -> right, uncovering the slanted seam line (and the icon stays on the two halves)
+      cover.animate([{ clipPath: "polygon(0 0,100% 0,100% 100%,0 100%)" }, { clipPath: "polygon(100% 0,100% 0,100% 100%,100% 100%)" }], { duration: 1000, easing: "cubic-bezier(.333,1,.666,1)", fill: "forwards" });
+      // 2) then the page is sliced: top half slides up, bottom half slides down
+      setTimeout(() => {
+        const ease = "cubic-bezier(.95,.05,.795,.035)";
+        top.animate([{ transform: "translateY(0)" }, { transform: "translateY(-100%)" }], { duration: 1000, easing: ease, fill: "forwards" });
+        bottom.animate([{ transform: "translateY(0)" }, { transform: "translateY(100%)" }], { duration: 1000, easing: ease, fill: "forwards" });
+        window.__a = document.getAnimations(); // DEBUG
+        document.body.classList.remove("is-loading");
+        lenis?.start();
+        setTimeout(intro, 650);
+        setTimeout(finish, 1050);
+      }, 1000);
+    });
 }
 
 /* ---------- hero intro ---------- */

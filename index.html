@@ -37,13 +37,34 @@
 
 <!-- LOADER -->
 <div class="loader" aria-hidden="true">
-  <div class="loader__stage">
-    <svg class="loader__icon is-on rough"><use href="#d-browser"/></svg>
-    <svg class="loader__icon rough"><use href="#d-gear"/></svg>
-    <svg class="loader__icon rough"><use href="#d-bolt"/></svg>
-    <svg class="loader__icon rough"><use href="#d-robot"/></svg>
+  <!-- three identical cream layers: top half / bottom half (cut along a slanted torn edge) / full cover that wipes away first -->
+  <div class="loader__layer loader__layer--top">
+    <div class="loader__stage">
+      <svg class="loader__icon is-on rough"><use href="#d-browser"/></svg>
+      <svg class="loader__icon rough"><use href="#d-gear"/></svg>
+      <svg class="loader__icon rough"><use href="#d-bolt"/></svg>
+      <svg class="loader__icon rough"><use href="#d-robot"/></svg>
+    </div>
+    <p class="loader__label hand">LOADING <b class="loader__count">0</b>%</p>
   </div>
-  <p class="loader__label hand">LOADING <b class="loader__count">0</b>%</p>
+  <div class="loader__layer loader__layer--bottom">
+    <div class="loader__stage">
+      <svg class="loader__icon is-on rough"><use href="#d-browser"/></svg>
+      <svg class="loader__icon rough"><use href="#d-gear"/></svg>
+      <svg class="loader__icon rough"><use href="#d-bolt"/></svg>
+      <svg class="loader__icon rough"><use href="#d-robot"/></svg>
+    </div>
+    <p class="loader__label hand">LOADING <b class="loader__count">0</b>%</p>
+  </div>
+  <div class="loader__layer loader__layer--cover">
+    <div class="loader__stage">
+      <svg class="loader__icon is-on rough"><use href="#d-browser"/></svg>
+      <svg class="loader__icon rough"><use href="#d-gear"/></svg>
+      <svg class="loader__icon rough"><use href="#d-bolt"/></svg>
+      <svg class="loader__icon rough"><use href="#d-robot"/></svg>
+    </div>
+    <p class="loader__label hand">LOADING <b class="loader__count">0</b>%</p>
+  </div>
 </div>
 
 <!-- HEADER -->
@@ -114,7 +135,7 @@
   </section>
 
   <!-- MARQUEE -->
-  <div class="marquee-wrapper" style="overflow: hidden; width: 100%; position: relative;">
+  <div class="marquee-wrapper" style="overflow-x: clip; overflow-y: visible; width: 100%; position: relative;">
     <div class="marquee" aria-hidden="true">
       <div class="marquee__track brush">
         <span>Websites ✺ Software ✺ Automations ✺ AI Tools ✺ Mobile Apps ✺ Dashboards ✺ </span>
