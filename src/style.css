@@ -257,9 +257,9 @@ section { position: relative; }
 .viewer__nav { display: flex; justify-content: center; align-items: center; gap: 30px; font-size: clamp(16px, 1.8vw, 24px); color: var(--orange); }
 .viewer__nav button { background: none; border: 0; color: inherit; font: inherit; font-size: 1.6em; cursor: pointer; padding: 0 8px; transition: transform .3s; }
 .viewer__prev:hover { transform: translateX(-8px); } .viewer__next:hover { transform: translateX(8px); }
-.vd { position: relative; z-index: 2; padding: clamp(90px, 12vw, 180px) var(--pad) 140px calc(var(--pad) + 40px); }
-.vd .side-label { top: clamp(90px, 12vw, 180px); }
-.vd__lead { max-width: 1000px; font: 400 clamp(26px, 3.6vw, 52px)/1.1 var(--display); text-transform: uppercase; }
+.vd { position: relative; z-index: 2; padding: clamp(40px, 6vw, 80px) var(--pad) 140px calc(var(--pad) + 40px); }
+.vd .side-label { top: clamp(40px, 6vw, 80px); }
+.vd__lead { max-width: 1000px; font: 400 clamp(16px, 2.5vw, 32px)/1.2 var(--display); text-transform: uppercase; }
 .vd__cols { margin-top: 80px; display: grid; grid-template-columns: 1fr 1.4fr; gap: 60px; align-items: start; }
 .vd h3 { font-size: 20px; color: var(--orange); margin-bottom: 14px; }
 .vd__tags { display: flex; flex-wrap: wrap; gap: 10px; font-size: 18px; }
@@ -268,7 +268,9 @@ section { position: relative; }
 .vd__stats li { border-top: 3px solid var(--orange); padding-top: 12px; }
 .vd__stats b { display: block; white-space: nowrap; font: 400 clamp(30px, 3.8vw, 64px)/1 var(--display); color: var(--orange); }
 .vd__stats span { font: 400 17px var(--hand-f); text-transform: uppercase; }
-.vd__cta { margin-top: 90px; border: 0; cursor: pointer; }
+.vd__actions { margin-top: 90px; display: flex; gap: 20px; flex-wrap: wrap; }
+.vd__actions .btn { margin-top: 0; cursor: pointer; border: 0; }
+.vd__link { text-decoration: none; align-items: center; justify-content: center; }
 @media (max-width: 800px) {
   .viewer__head { padding: 0 70px; }
   .vd { padding-left: var(--pad); } .vd__cols { grid-template-columns: 1fr; gap: 40px; }
