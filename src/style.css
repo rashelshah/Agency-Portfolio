@@ -194,7 +194,7 @@ section { position: relative; }
 .svc:nth-child(odd) { rotate: -1.4deg; } .svc:nth-child(even) { rotate: 1.2deg; margin-top: 50px; }
 .svc i { font: 400 24px var(--hand-f); font-style: normal; color: var(--orange); }
 .svc > svg { width: 110px; height: 110px; color: var(--orange); margin: 14px 0 auto; }
-.svc h3 { font: 400 clamp(40px, 4.6vw, 62px)/1 var(--display); text-transform: uppercase; }
+.svc h3 { font: 400 clamp(28px, 3.5vw, 46px)/1 var(--display); text-transform: uppercase; white-space: nowrap; }
 .svc p { margin: 12px 0 18px; font-size: 18px; }
 .svc ul { display: flex; flex-wrap: wrap; gap: 8px; font-size: 16px; }
 .svc li { border: 2px solid var(--ink); border-radius: 99px; padding: 3px 14px; }
@@ -216,7 +216,7 @@ section { position: relative; }
 
 /* ---------- contact ---------- */
 .contact { padding: clamp(130px, 16vw, 230px) var(--pad) 40px; text-align: center; display: grid; justify-items: center; }
-.contact__title { font: 400 clamp(54px, 12.4vw, 200px)/.88 var(--display); color: var(--orange); letter-spacing: -.015em; }
+.contact__title { font: 400 clamp(36px, 11vw, 200px)/.88 var(--display); color: var(--orange); letter-spacing: -.015em; white-space: nowrap; }
 .foot { margin-top: clamp(100px, 14vw, 200px); width: 100%; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; font-size: 18px; border-top: 2px dashed rgba(250,238,217,.35); padding-top: 24px; }
 .foot nav { display: flex; gap: 26px; }
 .foot a:hover { color: var(--orange); }
