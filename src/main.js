@@ -323,7 +323,7 @@ const PROJECTS = [
     lead: "ProdSync is a production management platform for film, television, and media teams that streamlines crew management, scheduling, call sheets, logistics, expenses, and reporting. It centralizes production workflows into a single system, improving coordination and operational efficiency.",
     tags: ["SOFTWARE", "SAAS", "REACT", "API"], stats: [["12K", "ACTIVE USERS"], ["-40%", "REPORT TIME"], ["99.9%", "UPTIME"]] },
   { name: "Glyph", c: "#e7a3b3", icon: "d-robot", client: "Glyph", kind: "Collaborative Latex Editor", link: "https://glyphs.vercel.app",
-    lead: "Collaborative Latex Editor",
+    lead: "Glyph is an open-source, web-based collaborative LaTeX editor engineered for team productivity and speed. It provides real-time document synchronization, high-fidelity compilation inside sandboxed environment, live syntax highlighting, workspace management, and instant sharing permissions.",
     tags: ["Collaboration", "EDITOR", "INTEGRATIONS"], stats: [["3,400", "HRS SAVED / MO"], ["0", "MISSED ORDERS"], ["4 WKS", "TO LAUNCH"]] },
   { name: "Crypton AI", c: "#6aa4c8", icon: "d-bolt", client: "Crypton AI", kind: "WEBSITE", link: "https://crypton-ai.vercel.app",
     lead: "Crypton AI is a modern cryptocurrency analysis and trading assistant that leverages AI to provide real-time insights, portfolio analysis, smart alerts, and a risk-free trading simulator.",
