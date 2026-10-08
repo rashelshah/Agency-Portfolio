@@ -280,8 +280,10 @@ function init() {
   const dist = () => svcTrack.scrollWidth - innerWidth;
   gsap.to(svcTrack, {
     x: () => -dist(), ease: "none",
-    scrollTrigger: { trigger: ".services", pin: ".services__pin", start: "top top", end: () => "+=" + dist(), scrub: 1, anticipatePin: 1, invalidateOnRefresh: true },
+    scrollTrigger: { trigger: ".services", pin: ".services__pin", start: "top top", end: () => "+=" + dist(), scrub: 1, anticipatePin: 1, invalidateOnRefresh: true, onUpdate: (s) => $(".services__pin").style.setProperty("--p", s.progress.toFixed(3)) },
   });
+
+  gsap.to(".services__deco", { x: () => -dist() * 0.32, ease: "none", scrollTrigger: { trigger: ".services", start: "top top", end: () => "+=" + dist(), scrub: 1, invalidateOnRefresh: true } });
 
   /* process: sticky stack that shrinks as the next card lands */
   const steps = $$(".step");
