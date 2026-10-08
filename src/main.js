@@ -127,7 +127,7 @@ function runLoader() {
   bottom.style.maskImage = bottom.style.webkitMaskImage = mBottom;
   const iconSets = layers.map((l) => $$(".loader__icon", l)), counts = $$(".loader__count");
   let i = 0;
-  const cycle = setInterval(() => {
+  const cycle = iconSets[0].length < 2 ? 0 : setInterval(() => {
     const prev = i; i = (i + 1) % iconSets[0].length;
     iconSets.forEach((set) => { set[prev].classList.remove("is-on"); set[i].classList.add("is-on"); });
     gsap.fromTo(iconSets.map((s) => s[i]), { rotate: -8, scale: 0.9 }, { rotate: 0, scale: 1, duration: 0.3, ease: "back.out(3)" });
@@ -135,8 +135,9 @@ function runLoader() {
 
   const finish = () => $(".loader").remove();
   const num = { v: 0 };
-  const tl = gsap.timeline({ delay: 0.2 });
-  tl.to(num, { v: 100, duration: reduced ? 0.1 : 2.2, ease: "power1.inOut", onUpdate: () => counts.forEach((c) => (c.textContent = Math.round(num.v))) })
+  const tl = gsap.timeline({ delay: 0.15 });
+  // no 0-100% count any more: a short beat on the cream sheet, then straight into the page cut
+  tl.to(num, { v: 100, duration: 0.25, ease: "power1.inOut", onUpdate: () => counts.forEach((c) => (c.textContent = Math.round(num.v))) })
     .add(() => {
       clearInterval(cycle);
       if (reduced) { document.body.classList.remove("is-loading"); lenis?.start(); finish(); intro(); return; }
@@ -484,6 +485,7 @@ const PROJECTS = [
     // opening starts as a full cream sheet; closing starts with the halves parked off-screen
     sL.style.transform = closing ? "translateX(-100%)" : ""; sR.style.transform = closing ? "translateX(100%)" : "";
     sC.style.clipPath = closing ? GONE : ""; sliceEl.style.opacity = closing ? 1 : 0;
+    sliceEl.classList.toggle("logo-mark", !!mark);   // page links show the logo; projects keep their own icon
     const p = mark || PROJECTS[i];
     $$(".slice__layer", sliceEl).forEach((l) => { $("svg use", l).setAttribute("href", "#" + p.icon); $("b", l).textContent = p.name; });
     sliceEl.style.visibility = "visible"; sliceEl.style.pointerEvents = "auto";

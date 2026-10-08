@@ -58,8 +58,8 @@ svg { display: block; }
 /* ---------- loader ---------- */
 .loader { position: fixed; inset: 0; z-index: 100; color: var(--orange); }
 .loader__layer { position: absolute; inset: 0; background: var(--cream); display: grid; place-content: center; justify-items: center; align-content: center; gap: 22px; will-change: transform; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; }
-.loader__stage { position: relative; width: 150px; height: 150px; }
-.loader__icon { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; }
+.loader__stage { position: relative; width: 190px; height: 170px; }
+.loader__icon { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; }
 .loader__icon.is-on { opacity: 1; }
 .loader__label { font-size: 22px; }
 .loader__count { display: inline-block; min-width: 2ch; text-align: right; font-weight: 400; }
@@ -349,3 +349,10 @@ section { position: relative; }
 /* centre the phone-shaped frames (and their caption) in their grid column so the gap is even on both sides */
 .card__img--phone { margin-inline: auto; }
 .card:has(.card__img--phone) { text-align: center; }
+
+.loader__label { display: none; }
+
+/* page transitions show the logo instead of a doodle */
+.slice__logo { display: none; width: 150px; height: 130px; object-fit: contain; margin: 0 auto; }
+.slice.logo-mark .slice__logo { display: block; }
+.slice.logo-mark .slice__mark svg { display: none; }
