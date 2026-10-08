@@ -6,6 +6,8 @@
   <title>Brisk Labs — Websites, Software &amp; Automations</title>
   <meta name="description" content="Brisk Labs is a mixed-media digital studio building websites, software and automations for brands with an edge." />
   <link rel="icon" type="image/png" href="/favicon.png" />
+  <!-- first paint: plain cream sheet (the loader colour) until the real stylesheet is in, so no raw/unstyled page ever flashes between pages -->
+  <style id="boot">html,body{margin:0;background:#faeed9}body>*{visibility:hidden}body>.loader{visibility:visible;position:fixed;inset:0;z-index:9999;background:#faeed9}body>.loader *{visibility:hidden}</style>
   <script type="module" src="/src/main.js"></script>
 </head>
 <body>
@@ -86,12 +88,13 @@
     <li><a href="#process"><i class="hand">03</i>Process</a></li>
     <li><a href="#contact"><i class="hand">04</i>Contact</a></li>
   </ul>
-  <p class="menu__foot hand">team@brickslab.online &nbsp;·&nbsp; REMOTE · WORLDWIDE</p>
+  <p class="menu__foot hand">team@brisklabs.online &nbsp;·&nbsp; REMOTE · WORLDWIDE</p>
 </nav>
 
 
 <!-- SLICE TRANSITION (projects) -->
 <div class="slice" aria-hidden="true">
+  <div class="slice__back"></div>
   <div class="slice__layer slice__layer--left"><div class="slice__mark"><svg class="rough"><use href="#d-browser"/></svg><b class="brush"></b></div></div>
   <div class="slice__layer slice__layer--right"><div class="slice__mark"><svg class="rough"><use href="#d-browser"/></svg><b class="brush"></b></div></div>
   <div class="slice__layer slice__layer--cover"><div class="slice__mark"><svg class="rough"><use href="#d-browser"/></svg><b class="brush"></b></div></div>
@@ -199,7 +202,7 @@
         <h3>Crypton AI</h3><p class="hand">AI · WEBSITE · CRYPTO</p>
       </button>
     </div>
-    <a class="btn" href="#contact" data-magnetic>VIEW ALL WORK</a>
+    <a class="btn" href="/work.html" data-page="All Work" data-magnetic>VIEW ALL WORK</a>
   </section>
 
   <!-- CLIENTS -->

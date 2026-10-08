@@ -7,6 +7,7 @@ import Lenis from "lenis";
 gsap.registerPlugin(ScrollTrigger, SplitText);
 ScrollTrigger.config({ ignoreMobileResize: true, limitCallbacks: true });
 
+document.getElementById("boot")?.remove(); // real CSS is applied by now
 const $ = (s, c = document) => c.querySelector(s);
 const $$ = (s, c = document) => [...c.querySelectorAll(s)];
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -14,6 +15,11 @@ const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 // WebKit (Safari, incl. iOS) renders SVG filters / blend modes on the CPU: flag it so CSS + JS can skip the costly bits
 const isSafari = /^((?!chrome|chromium|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent);
 if (isSafari) document.documentElement.classList.add("is-safari");
+const isHome = !!$(".hero"); // work.html shares this file but has no hero
+const MAIL = "team@brisklabs.online";
+// never restore the old scroll position on load: coming back to a page used to reveal wherever it was left (e.g. the Crypton AI card)
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+if (!location.hash) window.scrollTo(0, 0);
 
 /* ---------- paper: torn edges ---------- */
 // jagged SVG strip glued to the top of every [data-tear] section (rim = paper fibre, fill = section colour)
@@ -104,7 +110,17 @@ function sliceMasks() {
   return [make(true), make(false)];
 }
 
+let arrive = null; // set by the slice code below: opens the vertical halves on a freshly loaded page
 function runLoader() {
+  // arriving via an in-site link (or on the work page) skips the 0-100% count: cream sheet -> straight into the slice
+  const quickName = sessionStorage.getItem("quickLoad"); sessionStorage.removeItem("quickLoad");
+  const quick = !isHome || quickName !== null;
+  const T = { wipe: 1000, wait: 1000, slide: 1000, intro: 650, fin: 1050 };
+  if (quick && arrive) {
+    // continue the vertical slice from the previous page: the same cream halves open sideways (no horizontal cut)
+    arrive(quickName || (isHome ? "Brisk Labs" : "All Work"), () => { document.body.classList.remove("is-loading"); lenis?.start(); setTimeout(intro, 380); });
+    return;
+  }
   const layers = $$(".loader__layer"), [top, bottom, cover] = layers;
   const [mTop, mBottom] = sliceMasks();
   top.style.maskImage = top.style.webkitMaskImage = mTop;
@@ -125,17 +141,17 @@ function runLoader() {
       clearInterval(cycle);
       if (reduced) { document.body.classList.remove("is-loading"); lenis?.start(); finish(); intro(); return; }
       // 1) the cover layer wipes off left -> right, uncovering the slanted seam line (and the icon stays on the two halves)
-      cover.animate([{ clipPath: "polygon(0 0,100% 0,100% 100%,0 100%)" }, { clipPath: "polygon(100% 0,100% 0,100% 100%,100% 100%)" }], { duration: 1000, easing: "cubic-bezier(.333,1,.666,1)", fill: "forwards" });
+      cover.animate([{ clipPath: "polygon(0 0,100% 0,100% 100%,0 100%)" }, { clipPath: "polygon(100% 0,100% 0,100% 100%,100% 100%)" }], { duration: T.wipe, easing: "cubic-bezier(.333,1,.666,1)", fill: "forwards" });
       // 2) then the page is sliced: top half slides up, bottom half slides down
       setTimeout(() => {
         const ease = "cubic-bezier(.95,.05,.795,.035)";
-        top.animate([{ transform: "translateY(0)" }, { transform: "translateY(-100%)" }], { duration: 1000, easing: ease, fill: "forwards" });
-        bottom.animate([{ transform: "translateY(0)" }, { transform: "translateY(100%)" }], { duration: 1000, easing: ease, fill: "forwards" });
+        top.animate([{ transform: "translateY(0)" }, { transform: "translateY(-100%)" }], { duration: T.slide, easing: ease, fill: "forwards" });
+        bottom.animate([{ transform: "translateY(0)" }, { transform: "translateY(100%)" }], { duration: T.slide, easing: ease, fill: "forwards" });
         document.body.classList.remove("is-loading");
         lenis?.start();
-        setTimeout(intro, 650);
-        setTimeout(finish, 1050);
-      }, 1000);
+        setTimeout(intro, T.intro);
+        setTimeout(finish, T.fin);
+      }, T.wait);
     });
 }
 
@@ -143,6 +159,7 @@ function runLoader() {
 let heroSplit, introDone = false;
 function intro() {
   introDone = true;
+  if (!heroSplit) { gsap.from(".head", { yPercent: -120, duration: 0.9, ease: "power3.out" }); return; }
   const tl = gsap.timeline();
   tl.from(".head", { yPercent: -120, duration: 0.9, ease: "power3.out" })
     .fromTo(heroSplit.chars, { yPercent: 115, rotate: 6 }, { yPercent: 0, rotate: 0, duration: 0.9, stagger: 0.025, ease: "power4.out" }, 0)
@@ -151,15 +168,7 @@ function intro() {
     .from(".hero__scroll", { opacity: 0, y: 20, duration: 0.7 }, 1);
 }
 
-/* ---------- everything else ---------- */
-function init() {
-  /* hero: split now (hidden by loader), animate after load */
-  SplitText.create(".hero__title", {
-    type: "lines,chars", mask: "lines", linesClass: "ln", autoSplit: true,
-    onSplit: (self) => ((heroSplit = self), !introDone && gsap.set(self.chars, { yPercent: 115 })),
-  });
-
-  /* generic reveals */
+function reveals() {
   $$("[data-split]:not(.hero__title)").forEach((el) => {
     const mode = el.dataset.split;
     SplitText.create(el, {
@@ -174,6 +183,64 @@ function init() {
   $$("[data-reveal]:not(.hero__sub)").forEach((el) =>
     gsap.from(el, { y: 36, opacity: 0, duration: 1, ease: "power3.out", scrollTrigger: { trigger: el, start: "top 90%" } })
   );
+
+}
+function headTheme() {
+  const head = $(".head");
+  $$("section[data-theme], footer[data-theme]").forEach((s) =>
+    ScrollTrigger.create({
+      trigger: s, start: "top 50px", end: "bottom 50px",
+      onToggle: (self) => self.isActive && (head.className = "head is-" + s.dataset.theme),
+    })
+  );
+
+}
+
+/* ---------- all-projects page ---------- */
+function initWorkPage() {
+  reveals();
+  headTheme();
+  $$(".card").forEach((c, i) => {
+    gsap.from(c, { y: 140, rotate: i % 2 ? 3 : -3, opacity: 0, duration: 1.2, ease: "power3.out", scrollTrigger: { trigger: c, start: "top 92%" } });
+    const art = $("svg", c); // only the icon art drifts; moving a screenshot would expose the card colour behind it
+    if (art) gsap.fromTo(art, { yPercent: 12 }, { yPercent: -12, ease: "none", scrollTrigger: { trigger: c, start: "top bottom", end: "bottom top", scrub: true } });
+  });
+
+  // filter chips: cards that do not match shrink away, the rest re-flow and pop back in
+  const cards = $$(".card"), chips = $$(".chip"), empty = $(".work__empty"), count = $(".work__count");
+  let busy = false;
+  const layout = () => $$(".card:not([hidden])").forEach((c, i) => c.classList.toggle("card--low", i % 2 === 1));
+  chips.forEach((chip) => chip.addEventListener("click", () => {
+    if (busy || chip.classList.contains("is-on")) return;
+    busy = true;
+    chips.forEach((c) => c.classList.toggle("is-on", c === chip));
+    const f = chip.dataset.filter, match = (c) => f === "all" || c.dataset.cat.split(" ").includes(f);
+    gsap.timeline({ onComplete: () => (busy = false) })
+      .to(cards.filter((c) => !c.hidden), { scale: 0.88, opacity: 0, rotate: () => rnd(-6, 6), duration: 0.28, stagger: 0.03, ease: "power2.in" })
+      .add(() => {
+        cards.forEach((c) => (c.hidden = !match(c)));
+        const shown = cards.filter((c) => !c.hidden);
+        empty.hidden = shown.length > 0;
+        count.textContent = String(shown.length).padStart(2, "0");
+        layout();
+        ScrollTrigger.refresh();
+        gsap.fromTo(shown, { scale: 0.7, opacity: 0, y: 60, rotate: () => rnd(-8, 8) }, { scale: 1, opacity: 1, y: 0, rotate: 0, duration: 0.7, stagger: 0.08, ease: "back.out(1.6)", clearProps: "transform" });
+      });
+  }));
+  layout();
+  ScrollTrigger.refresh();
+}
+
+/* ---------- everything else ---------- */
+function init() {
+  if (!isHome) return initWorkPage();
+  /* hero: split now (hidden by loader), animate after load */
+  SplitText.create(".hero__title", {
+    type: "lines,chars", mask: "lines", linesClass: "ln", autoSplit: true,
+    onSplit: (self) => ((heroSplit = self), !introDone && gsap.set(self.chars, { yPercent: 115 })),
+  });
+
+  reveals();
 
   /* manifesto: words fill in as you scroll */
   const words = SplitText.create("[data-scrub]", { type: "words", wordsClass: "w" }).words;
@@ -224,14 +291,7 @@ function init() {
       gsap.to(s, { scale: 0.92, ease: "none", scrollTrigger: { trigger: steps[i + 1], start: "top 92%", end: "top 24%", scrub: true } });
   });
 
-  /* header colour follows the section underneath */
-  const head = $(".head");
-  $$("section[data-theme], footer[data-theme]").forEach((s) =>
-    ScrollTrigger.create({
-      trigger: s, start: "top 50px", end: "bottom 50px",
-      onToggle: (self) => self.isActive && (head.className = "head is-" + s.dataset.theme),
-    })
-  );
+  headTheme();
 
   /* clients: stamp-in cards, parallax, tilt, drawn scribble, tickers */
   const clientCards = $$(".cl__card");
@@ -328,6 +388,19 @@ const PROJECTS = [
   { name: "Crypton AI", c: "#6aa4c8", icon: "d-bolt", client: "Crypton AI", kind: "WEBSITE", link: "https://crypton-ai.vercel.app",
     lead: "Crypton AI is a modern cryptocurrency analysis and trading assistant that leverages AI to provide real-time insights, portfolio analysis, smart alerts, and a risk-free trading simulator.",
     tags: ["Website", "SAAS", "REACT", "UI/UX"], stats: [["100+", "CRYPTOCURRENCIES"], ["<2 SEC", "RESPONSE TIME"], ["24/7", "AI ASSISTANT"]] },
+  // MOCK DATA for the extra work-page projects (cards 4-7): replace with the real details later
+  { name: "Nimbus", c: "#d9dc7a", icon: "d-bolt", client: "Nimbus", kind: "Mobile App",
+    lead: "A weather-meets-planning app with a personality. Native-feeling on iOS and Android from a single codebase.",
+    tags: ["MOBILE APP", "IOS", "ANDROID"], stats: [["4.8★", "APP STORE"], ["200K", "DOWNLOADS"], ["10 WKS", "TO LAUNCH"]] },
+  { name: "Marlow & Co", c: "#f25f36", icon: "d-browser", client: "Marlow & Co", kind: "Online Store",
+    lead: "A heritage homeware brand needed a store as warm as their showroom, and one that sells like a machine.",
+    tags: ["E-COMMERCE", "SHOPIFY", "BRANDING"], stats: [["+64%", "CONVERSION"], ["1.1s", "LOAD TIME"], ["6 WKS", "TO LAUNCH"]] },
+  { name: "Ledgerly", c: "#2f7a72", icon: "d-gear", client: "Ledgerly", kind: "Finance Dashboard",
+    lead: "Spreadsheets out, clarity in. A real-time finance dashboard that teams actually enjoy opening.",
+    tags: ["SOFTWARE", "SAAS", "REACT"], stats: [["12K", "ACTIVE USERS"], ["-40%", "REPORT TIME"], ["99.9%", "UPTIME"]] },
+  { name: "Parcel Pilot", c: "#e7a3b3", icon: "d-robot", client: "Parcel Pilot", kind: "Logistics Bot",
+    lead: "Orders, couriers and customer emails were all manual. Now a swarm of quiet little bots handles it end to end.",
+    tags: ["AUTOMATION", "AI AGENTS", "INTEGRATIONS"], stats: [["3,400", "HRS SAVED / MO"], ["0", "MISSED ORDERS"], ["4 WKS", "TO LAUNCH"]] },
 ];
 {
   const v = $(".viewer"), media = $(".viewer__media"), title = $(".viewer__title"), dir = $(".viewer__dir");
@@ -344,7 +417,7 @@ const PROJECTS = [
     $("b", media).textContent = p.name;
     title.textContent = name;
     dir.textContent = meta;
-    $(".viewer__count").textContent = `WORK ${pad(i + 1)} / ${pad(PROJECTS.length)}`;
+    $(".viewer__count").textContent = `WORK ${pad(i + 1)} / ${pad($$(".card").length)}`;
     $(".vd__lead").textContent = p.lead;
     $(".vd__tags").innerHTML = meta.split("·").map((t) => `<li>${t.trim()}</li>`).join("");
     $(".vd__stats").innerHTML = p.stats.map(([n, l]) => `<li><b>${n}</b><span>${l}</span></li>`).join("");
@@ -362,12 +435,11 @@ const PROJECTS = [
 
   /* ---- vertical slice transition (the intro's slice, turned 90deg): a slanted torn seam draws top -> bottom, then the
      page splits along it; left half slides left, right half slides right. Close runs it back together and apart again. ---- */
-  const sliceEl = $(".slice"), [sL, sR, sC] = $$(".slice__layer", sliceEl);
+  const sliceEl = $(".slice"), sB = $(".slice__back"), [sL, sR, sC] = $$(".slice__layer", sliceEl);
+  // The two seam masks are PNGs rendered at viewport size: costly to build, so they are built once at idle time,
+  // cached in sessionStorage (the next page of the visit reuses them instantly) and pre-decoded. Nothing heavy runs when you click.
   let maskKey = "";
-  const prepMasks = () => {
-    const w = innerWidth, h = innerHeight, key = w + "x" + h;
-    if (key === maskKey) return;
-    maskKey = key;
+  const buildMasks = (w, h) => {
     const gap = Math.max(2, Math.round(w / 300)), edge = new Float32Array(h), p1 = rnd(0, 6), p2 = rnd(0, 6), p3 = rnd(0, 6);
     for (let y = 0; y < h; y++) {
       const t = y / h; // seam leans from upper-right to lower-left
@@ -379,24 +451,42 @@ const PROJECTS = [
       if (left) { g.moveTo(0, 0); g.lineTo(0, h); for (let y = h - 1; y >= 0; y--) g.lineTo(edge[y], y); }
       else { g.moveTo(w, 0); g.lineTo(w, h); for (let y = h - 1; y >= 0; y--) g.lineTo(edge[y] + gap, y); }
       g.closePath(); g.fill();
-      return `url(${c.toDataURL("image/png")})`;
+      return c.toDataURL("image/png");
     };
-    const [ml, mr] = [make(true), make(false)];
+    return [make(true), make(false)];
+  };
+  const prepMasks = () => {
+    const w = innerWidth, h = innerHeight, key = w + "x" + h;
+    if (key === maskKey) return;
+    maskKey = key;
+    let urls = null;
+    try { urls = JSON.parse(sessionStorage.getItem("sliceMasks:" + key)); } catch (e) {}
+    if (!urls) {
+      urls = buildMasks(w, h);
+      try { Object.keys(sessionStorage).filter((k) => k.startsWith("sliceMasks:")).forEach((k) => sessionStorage.removeItem(k)); sessionStorage.setItem("sliceMasks:" + key, JSON.stringify(urls)); } catch (e) {}
+    }
+    const [ml, mr] = urls.map((u) => `url(${u})`);
     sL.style.maskImage = sL.style.webkitMaskImage = ml;
     sR.style.maskImage = sR.style.webkitMaskImage = mr;
+    urls.forEach((u) => { const im = new Image(); im.src = u; im.decode?.().catch(() => {}); }); // decode now, not on first paint
   };
+  (window.requestIdleCallback || ((f) => setTimeout(f, 1200)))(prepMasks, { timeout: 2500 });
+  addEventListener("resize", () => (window.requestIdleCallback || ((f) => setTimeout(f, 300)))(prepMasks));
+
   const EASE_IN = "cubic-bezier(.95,.05,.795,.035)", EASE_OUT = "cubic-bezier(.205,.965,.05,.95)", FULL = "polygon(0 0,100% 0,100% 100%,0 100%)", GONE = "polygon(0 100%,100% 100%,100% 100%,0 100%)";
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const anim = (el, kf, o) => el.animate(kf, { fill: "forwards", ...o }).finished;
-  const prepSlice = (i, closing) => {
+  const prepSlice = (i, closing, mark) => {
     sliceEl.getAnimations({ subtree: true }).forEach((a) => a.cancel());
     prepMasks();
     // opening starts as a full cream sheet; closing starts with the halves parked off-screen
     sL.style.transform = closing ? "translateX(-100%)" : ""; sR.style.transform = closing ? "translateX(100%)" : "";
     sC.style.clipPath = closing ? GONE : ""; sliceEl.style.opacity = closing ? 1 : 0;
-    const p = PROJECTS[i];
+    const p = mark || PROJECTS[i];
     $$(".slice__layer", sliceEl).forEach((l) => { $("svg use", l).setAttribute("href", "#" + p.icon); $("b", l).textContent = p.name; });
     sliceEl.style.visibility = "visible"; sliceEl.style.pointerEvents = "auto";
+    // closing: the gap between the halves fills with black, so the page being left never shows through it
+    sB.style.opacity = closing ? 1 : 0;
   };
   const apart = () => Promise.all([
     anim(sL, [{ transform: "translateX(0)" }, { transform: "translateX(-100%)" }], { duration: 900, easing: EASE_IN }),
@@ -407,6 +497,16 @@ const PROJECTS = [
     anim(sR, [{ transform: "translateX(100%)" }, { transform: "translateX(0)" }], { duration: 800, easing: EASE_OUT }),
   ]);
   const endSlice = () => { sliceEl.style.visibility = "hidden"; sliceEl.style.pointerEvents = "none"; sliceEl.getAnimations({ subtree: true }).forEach((a) => a.cancel()); };
+
+  arrive = async (name, onStart) => {
+    prepSlice(0, false, { icon: "d-browser", name });
+    sL.style.transform = sR.style.transform = ""; sC.style.clipPath = GONE; sliceEl.style.opacity = 1;
+    $(".loader")?.remove();                      // the loader is the same cream, so the swap is invisible
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));   // let the page paint before moving anything
+    await wait(220);
+    const slide = apart(); onStart?.();
+    await slide; endSlice();
+  };
 
   async function open(i, card) {
     if (isOpen || busy) return;
@@ -442,6 +542,7 @@ const PROJECTS = [
     await together();                                                                  // halves meet over the project
     v.scrollTo({ top: 0 }); gsap.set(v, { visibility: "hidden" }); v.setAttribute("aria-hidden", "true");
     await wait(140);
+    sB.style.opacity = 0;                              // halves are fully closed, so this is invisible; the reveal must show the page
     await apart();                                                                     // and split again, revealing the page
     endSlice(); isOpen = busy = false; lenis?.start();
   }
@@ -449,7 +550,7 @@ const PROJECTS = [
   function go(dirn) {
     if (!isOpen || busy) return;
     busy = true;
-    const next = (cur + dirn + PROJECTS.length) % PROJECTS.length;
+    const total = $$(".card").length, next = (cur + dirn + total) % total;
     gsap.timeline({ onComplete: () => (busy = false) })
       .to([media, title, dir], { x: -60 * dirn, opacity: 0, duration: 0.3, ease: "power2.in" })
       .add(() => { cur = next; fill(next); })
@@ -462,7 +563,20 @@ const PROJECTS = [
   $(".viewer__prev").addEventListener("click", () => go(-1));
   $(".viewer__next").addEventListener("click", () => go(1));
   $(".viewer__play").addEventListener("click", () => v.scrollTo({ top: innerHeight, behavior: "smooth" }));
-  $(".vd__cta").addEventListener("click", async () => { await close(); scrollTo("#contact"); });
+  $(".vd__cta").addEventListener("click", () => {
+    const subject = encodeURIComponent("Project enquiry: something like " + PROJECTS[cur].name);
+    window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${MAIL}&su=${subject}`, "_blank", "noopener,noreferrer");
+  });
+  // links to another page: close the cream halves over this page first, then navigate (the next page opens them again)
+  $$("[data-page]").forEach((a) => a.addEventListener("click", async (e) => {
+    e.preventDefault();
+    if (busy) return;
+    busy = true; lenis?.stop();
+    sessionStorage.setItem("quickLoad", a.dataset.page);
+    prepSlice(0, true, { icon: "d-browser", name: a.dataset.page });
+    await together();
+    location.href = a.href;
+  }));
   addEventListener("keydown", (e) => { if (!isOpen) return; if (e.key === "Escape") close(); if (e.key === "ArrowRight") go(1); if (e.key === "ArrowLeft") go(-1); });
 
   // story section reveals as the viewer scrolls

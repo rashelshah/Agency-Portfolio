@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>All Work — Brisk Labs</title>
+  <meta name="description" content="Brisk Labs is a mixed-media digital studio building websites, software and automations for brands with an edge." />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <!-- first paint: plain cream sheet (the loader colour) until the real stylesheet is in, so no raw/unstyled page ever flashes between pages -->
+  <style id="boot">html,body{margin:0;background:#faeed9}body>*{visibility:hidden}body>.loader{visibility:visible;position:fixed;inset:0;z-index:9999;background:#faeed9}body>.loader *{visibility:hidden}</style>
+  <script type="module" src="/src/main.js"></script>
+</head>
+<body>
+
+<!-- shared SVG: hand-cut / ink-bleed filter + doodle symbols -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="rough" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence id="rough-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="3" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="ink" x="-2%" y="-5%" width="104%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.1" numOctaves="3" seed="8" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3.5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <symbol id="d-bolt" viewBox="0 0 100 100"><path d="M58 4 22 54h26l-8 42 38-54H52z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></symbol>
+    <symbol id="d-star" viewBox="0 0 100 100"><path d="M50 4c4 26 20 42 46 46-26 4-42 20-46 46-4-26-20-42-46-46 26-4 42-20 46-46z" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round"/></symbol>
+    <symbol id="d-browser" viewBox="0 0 100 100"><rect x="8" y="16" width="84" height="68" rx="6" fill="none" stroke="currentColor" stroke-width="5"/><path d="M8 34h84M20 25h.1M31 25h.1M42 25h.1M22 50h30M22 62h46M22 73h20" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></symbol>
+    <symbol id="d-gear" viewBox="0 0 100 100"><circle cx="50" cy="50" r="15" fill="none" stroke="currentColor" stroke-width="5"/><path d="M50 8v14M50 78v14M8 50h14M78 50h14M20 20l10 10M70 70l10 10M80 20 70 30M30 70 20 80" stroke="currentColor" stroke-width="7" stroke-linecap="round"/><circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" stroke-width="5"/></symbol>
+    <symbol id="d-robot" viewBox="0 0 100 100"><rect x="18" y="30" width="64" height="50" rx="10" fill="none" stroke="currentColor" stroke-width="5"/><path d="M50 30V14M44 14h12M8 52v12M92 52v12M36 78v10M64 78v10" stroke="currentColor" stroke-width="5" stroke-linecap="round"/><circle cx="37" cy="52" r="6" fill="currentColor"/><circle cx="63" cy="52" r="6" fill="currentColor"/><path d="M38 68h24" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></symbol>
+    <symbol id="d-palm" viewBox="0 0 100 100"><path d="M52 94C50 70 50 52 54 38M54 38C40 22 24 26 10 36M54 38c-4-18 4-30 18-34M54 38c14-12 26-12 36 0M54 38c16 2 26 12 28 28M54 38C44 40 34 50 30 64" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></symbol>
+    <symbol id="d-arrow" viewBox="0 0 120 60"><path d="M4 40C30 8 70 6 108 30M108 30 88 22M108 30l-6 22" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="d-scribble" viewBox="0 0 200 20"><path d="M4 12C30 2 40 18 66 8s34 10 62 0 36 8 68-2" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="cursor" aria-hidden="true"><span></span></div>
+
+<!-- LOADER -->
+<div class="loader" aria-hidden="true">
+  <!-- three identical cream layers: top half / bottom half (cut along a slanted torn edge) / full cover that wipes away first -->
+  <div class="loader__layer loader__layer--top">
+    <div class="loader__stage">
+      <svg class="loader__icon is-on rough"><use href="#d-browser"/></svg>
+      <svg class="loader__icon rough"><use href="#d-gear"/></svg>
+      <svg class="loader__icon rough"><use href="#d-bolt"/></svg>
+      <svg class="loader__icon rough"><use href="#d-robot"/></svg>
+    </div>
+    <p class="loader__label hand">LOADING <b class="loader__count">0</b>%</p>
+  </div>
+  <div class="loader__layer loader__layer--bottom">
+    <div class="loader__stage">
+      <svg class="loader__icon is-on rough"><use href="#d-browser"/></svg>
+      <svg class="loader__icon rough"><use href="#d-gear"/></svg>
+      <svg class="loader__icon rough"><use href="#d-bolt"/></svg>
+      <svg class="loader__icon rough"><use href="#d-robot"/></svg>
+    </div>
+    <p class="loader__label hand">LOADING <b class="loader__count">0</b>%</p>
+  </div>
+  <div class="loader__layer loader__layer--cover">
+    <div class="loader__stage">
+      <svg class="loader__icon is-on rough"><use href="#d-browser"/></svg>
+      <svg class="loader__icon rough"><use href="#d-gear"/></svg>
+      <svg class="loader__icon rough"><use href="#d-bolt"/></svg>
+      <svg class="loader__icon rough"><use href="#d-robot"/></svg>
+    </div>
+    <p class="loader__label hand">LOADING <b class="loader__count">0</b>%</p>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="head" data-theme="dark">
+  <a class="logo" href="/" aria-label="Brisk Labs home">
+    <span class="logo__tag hand">WEBSITES ⚡ SOFTWARE</span>
+    <span class="logo__word brush">Brisk Labs</span>
+  </a>
+  <button class="burger" aria-label="Open menu" aria-expanded="false" data-cursor="MENU">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- MENU -->
+<nav class="menu" aria-label="Main">
+  <ul>
+    <li><a href="/"><i class="hand">01</i>Home</a></li>
+    <li><a href="/#services"><i class="hand">02</i>Services</a></li>
+    <li><a href="/#process"><i class="hand">03</i>Process</a></li>
+    <li><a href="#contact"><i class="hand">04</i>Contact</a></li>
+  </ul>
+  <p class="menu__foot hand">team@brisklabs.online &nbsp;·&nbsp; REMOTE · WORLDWIDE</p>
+</nav>
+
+
+<!-- SLICE TRANSITION (projects) -->
+<div class="slice" aria-hidden="true">
+  <div class="slice__back"></div>
+  <div class="slice__layer slice__layer--left"><div class="slice__mark"><svg class="rough"><use href="#d-browser"/></svg><b class="brush"></b></div></div>
+  <div class="slice__layer slice__layer--right"><div class="slice__mark"><svg class="rough"><use href="#d-browser"/></svg><b class="brush"></b></div></div>
+  <div class="slice__layer slice__layer--cover"><div class="slice__mark"><svg class="rough"><use href="#d-browser"/></svg><b class="brush"></b></div></div>
+</div>
+
+<!-- PROJECT VIEWER -->
+<div class="viewer" aria-hidden="true" role="dialog" aria-label="Project" data-lenis-prevent>
+  <section class="viewer__top">
+    <header class="viewer__head"><h2 class="viewer__title"></h2><p class="viewer__dir hand"></p></header>
+    <button class="viewer__close" aria-label="Close project" data-cursor="CLOSE"><span></span><span></span></button>
+    <div class="viewer__stage">
+      <div class="viewer__media halftone">
+        <img class="viewer__img" alt="" /><svg class="rough"><use href="#d-browser"/></svg><b class="brush"></b>
+        <button class="viewer__play hand" type="button">CASE<br>STUDY ↓</button>
+      </div>
+    </div>
+    <nav class="viewer__nav hand"><button class="viewer__prev" aria-label="Previous project">←</button><span class="viewer__count"></span><button class="viewer__next" aria-label="Next project">→</button></nav>
+  </section>
+  <section class="vd">
+    <span class="side-label hand">— THE STORY</span>
+    <p class="vd__lead"></p>
+    <div class="vd__cols">
+      <div><h3 class="hand">WHAT WE DID</h3><ul class="vd__tags hand"></ul></div>
+      <ul class="vd__stats"></ul>
+    </div>
+    <div class="vd__actions">
+      <a class="btn vd__link" target="_blank" rel="noopener noreferrer" data-magnetic>VISIT WEBSITE</a>
+      <button class="btn vd__cta" type="button" data-magnetic>START A PROJECT LIKE THIS</button>
+    </div>
+  </section>
+</div>
+
+<main id="top">
+
+  <section class="work work--all" id="work" data-theme="dark" data-tear="#1a1a1a">
+    <a class="back hand" href="/" data-page="Brisk Labs" data-magnetic>← BACK TO SITE</a>
+    <span class="side-label hand">— THE ARCHIVE</span>
+    <h2 class="h2" data-split="lines">ALL<br>WORK</h2>
+    <p class="work__intro hand" data-reveal>EVERYTHING WE'VE BUILT, BROKEN &amp; SHIPPED. <b class="work__count">08</b> PROJECTS AND COUNTING.</p>
+    <div class="work__filters hand" role="tablist" aria-label="Filter projects">
+      <button type="button" class="chip is-on" data-filter="all">ALL</button>
+      <button type="button" class="chip" data-filter="website">WEBSITES</button>
+      <button type="button" class="chip" data-filter="software">SOFTWARE</button>
+      <button type="button" class="chip" data-filter="automation">AUTOMATION</button>
+      <button type="button" class="chip" data-filter="app">APPS</button>
+    </div>
+    <div class="work__grid">
+      <button type="button" class="card" data-project="0" data-cat="website software" data-cursor="VIEW" style="--c:#f25f36">
+        <div class="card__img halftone">
+          <img loading="lazy" decoding="async" src="/src/assets/forge.jpeg" alt="Forge Project" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;" />
+          <b class="brush"></b>
+        </div>
+        <h3>Forge</h3><p class="hand">WEBSITE · AGENTIC AI · SOFTWARE</p>
+      </button>
+      <button type="button" class="card card--low" data-project="1" data-cat="software" data-cursor="VIEW" style="--c:#2f7a72">
+        <div class="card__img halftone">
+          <img loading="lazy" decoding="async" src="/src/assets/prodsync.jpeg" alt="Prodsync Project" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;" />
+          <b class="brush"></b>
+        </div>
+        <h3>PRODSYNC - From Planning to Production</h3><p class="hand">SOFTWARE · SAAS · REACT</p>
+      </button>
+      <button type="button" class="card" data-project="2" data-cat="software website" data-cursor="VIEW" style="--c:#e7a3b3">
+        <div class="card__img halftone">
+          <img loading="lazy" decoding="async" src="/src/assets/glyph.jpeg" alt="Glyph Project" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;" />
+          <b class="brush"></b>
+        </div>
+        <h3>GLYPH</h3><p class="hand">LATEX EDITOR · AI · WEBSITE</p>
+      </button>
+      <button type="button" class="card card--low" data-project="3" data-cat="website" data-cursor="VIEW" style="--c:#6aa4c8">
+        <div class="card__img halftone">
+          <img loading="lazy" decoding="async" src="/src/assets/crypton.jpeg" alt="Crypton AI Project" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;" />
+          <b class="brush"></b>
+        </div>
+        <h3>Crypton AI</h3><p class="hand">AI · WEBSITE · CRYPTO</p>
+      </button>
+      <!-- MOCK PROJECTS: swap title / meta / data-cat / image when the real ones are ready -->
+      <button type="button" class="card" data-project="4" data-cat="app" data-cursor="VIEW" style="--c:#d9dc7a">
+        <div class="card__img halftone">
+          <svg class="rough"><use href="#d-bolt"/></svg><b class="brush">Nimbus</b>
+          <b class="brush"></b>
+        </div>
+        <h3>Nimbus — Weather &amp; Planning App</h3><p class="hand">MOBILE APP · IOS · ANDROID</p>
+      </button>
+      <button type="button" class="card card--low" data-project="5" data-cat="website" data-cursor="VIEW" style="--c:#f25f36">
+        <div class="card__img halftone">
+          <svg class="rough"><use href="#d-browser"/></svg><b class="brush">Marlow &amp; Co</b>
+          <b class="brush"></b>
+        </div>
+        <h3>Marlow &amp; Co — Online Store</h3><p class="hand">E-COMMERCE · SHOPIFY · BRANDING</p>
+      </button>
+      <button type="button" class="card" data-project="6" data-cat="software" data-cursor="VIEW" style="--c:#2f7a72">
+        <div class="card__img halftone">
+          <svg class="rough"><use href="#d-gear"/></svg><b class="brush">Ledgerly</b>
+          <b class="brush"></b>
+        </div>
+        <h3>Ledgerly — Finance Dashboard</h3><p class="hand">SOFTWARE · SAAS · REACT</p>
+      </button>
+      <button type="button" class="card card--low" data-project="7" data-cat="automation" data-cursor="VIEW" style="--c:#e7a3b3">
+        <div class="card__img halftone">
+          <svg class="rough"><use href="#d-robot"/></svg><b class="brush">Parcel Pilot</b>
+          <b class="brush"></b>
+        </div>
+        <h3>Parcel Pilot — Logistics Bot</h3><p class="hand">AUTOMATION · AI AGENTS · INTEGRATIONS</p>
+      </button>
+    </div>
+    <p class="work__empty hand" hidden>NOTHING HERE YET — CHECK BACK SOON ✦</p>
+  </section>
+
+  <footer class="contact" id="contact" data-theme="dark" data-tear="#1a1a1a">
+    <h2 class="contact__title" data-split="chars">LET’S MAKE<br>SOMETHING<br>LOUD.</h2>
+    <a class="btn btn--big" href="https://mail.google.com/mail/?view=cm&fs=1&to=team@brisklabs.online" target="_blank" rel="noopener noreferrer" data-magnetic>team@brisklabs.online</a>
+    <div class="foot hand">
+      <span>REMOTE · WORLDWIDE</span>
+      <nav><a href="/">HOME</a><a href="/#services">SERVICES</a><a href="/#process">PROCESS</a><a href="#contact">CONTACT</a></nav>
+      <span>© 2026 BRISK LABS</span>
+    </div>
+  </footer>
+</main>
+
+</body>
+</html>
