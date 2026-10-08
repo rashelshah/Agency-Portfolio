@@ -342,3 +342,10 @@ section { position: relative; }
 .svc:hover .float { animation: svcbob 1.6s ease-in-out infinite; } .svc:hover .float2 { animation: svcbob 1.9s ease-in-out infinite reverse; } .svc:hover .bob { animation: svcbob 1.3s ease-in-out infinite; }
 .svc:hover .spin { animation: svcspin 7s linear infinite; } .svc:hover .spin.r { animation-direction: reverse; }
 .svc:hover .cur { animation: svcbob .9s ease-in-out infinite; }
+
+/* phone screenshots: the frame takes the image's own portrait shape, so only the picture shows (no letterbox bars) */
+.card__img--phone { aspect-ratio: var(--ar); width: min(54%, 300px); background: none; }
+.card__img--phone::before, .card__img--phone::after { display: none; }
+/* centre the phone-shaped frames (and their caption) in their grid column so the gap is even on both sides */
+.card__img--phone { margin-inline: auto; }
+.card:has(.card__img--phone) { text-align: center; }
