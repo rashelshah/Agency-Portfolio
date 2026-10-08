@@ -318,16 +318,16 @@ $$("[data-magnetic]").forEach((el) => {
 const PROJECTS = [
   { name: "Forge", c: "#f25f36", icon: "d-browser", client: "Forge", kind: "Agentic AI Website", link: "https://forge-frontend-se6u.onrender.com",
     lead: "Forge is an AI-powered startup validation and execution platform that helps founders transform ideas into actionable business plans, roadmaps, and growth strategies. It combines intelligent research, market analysis, and project management tools to guide startups from concept to launch.",
-    tags: ["WEBSITE", "AUTOMATION", "AI AGENTS", "INTEGRATIONS"], stats: [["+64%", "CONVERSION"], ["1.1s", "LOAD TIME"], ["6 WKS", "TO LAUNCH"]] },
+    tags: ["WEBSITE", "AUTOMATION", "AI AGENTS", "INTEGRATIONS"], stats: [["1000+", "STARTUP SIGNALS"], ["100+", "GROWTH TACTICS"], ["10X", "FASTER EXECUTION"]] },
   { name: "PRODSYNC", c: "#2f7a72", icon: "d-gear", client: "Tubelight Mediaworks", kind: "SAAS", link: "https://www.prodsync.in",
     lead: "ProdSync is a production management platform for film, television, and media teams that streamlines crew management, scheduling, call sheets, logistics, expenses, and reporting. It centralizes production workflows into a single system, improving coordination and operational efficiency.",
-    tags: ["SOFTWARE", "SAAS", "REACT", "API"], stats: [["12K", "ACTIVE USERS"], ["-40%", "REPORT TIME"], ["99.9%", "UPTIME"]] },
+    tags: ["SOFTWARE", "SAAS", "REACT", "API"], stats: [["1", "SOURCE OF TRUTH"], ["10X", "BETTER ALIGNMENT"], ["99.9%", "WORKFLOW CLARITY"]] },
   { name: "Glyph", c: "#e7a3b3", icon: "d-robot", client: "Glyph", kind: "Collaborative Latex Editor", link: "https://glyphs.vercel.app",
     lead: "Glyph is an open-source, web-based collaborative LaTeX editor engineered for team productivity and speed. It provides real-time document synchronization, high-fidelity compilation inside sandboxed environment, live syntax highlighting, workspace management, and instant sharing permissions.",
-    tags: ["Collaboration", "EDITOR", "INTEGRATIONS"], stats: [["3,400", "HRS SAVED / MO"], ["0", "MISSED ORDERS"], ["4 WKS", "TO LAUNCH"]] },
+    tags: ["Collaboration", "EDITOR", "INTEGRATIONS"], stats: [["100%", "LOCAL FIRST"], ["100+", "HRS SAVED / MO"], ["1", "UNIFIED WORKSPACE"]] },
   { name: "Crypton AI", c: "#6aa4c8", icon: "d-bolt", client: "Crypton AI", kind: "WEBSITE", link: "https://crypton-ai.vercel.app",
     lead: "Crypton AI is a modern cryptocurrency analysis and trading assistant that leverages AI to provide real-time insights, portfolio analysis, smart alerts, and a risk-free trading simulator.",
-    tags: ["Website", "SAAS", "REACT", "UI/UX"], stats: [["4.8★", "APP STORE"], ["200K", "DOWNLOADS"], ["10 WKS", "TO LAUNCH"]] },
+    tags: ["Website", "SAAS", "REACT", "UI/UX"], stats: [["100+", "CRYPTOCURRENCIES"], ["<2 SEC", "RESPONSE TIME"], ["24/7", "AI ASSISTANT"]] },
 ];
 {
   const v = $(".viewer"), media = $(".viewer__media"), title = $(".viewer__title"), dir = $(".viewer__dir");
