@@ -5,11 +5,15 @@ import { SplitText } from "gsap/SplitText";
 import Lenis from "lenis";
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
+ScrollTrigger.config({ ignoreMobileResize: true, limitCallbacks: true });
 
 const $ = (s, c = document) => c.querySelector(s);
 const $$ = (s, c = document) => [...c.querySelectorAll(s)];
 const rnd = (a, b) => a + Math.random() * (b - a);
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+// WebKit (Safari, incl. iOS) renders SVG filters / blend modes on the CPU: flag it so CSS + JS can skip the costly bits
+const isSafari = /^((?!chrome|chromium|android|crios|fxios|edg).)*safari/i.test(navigator.userAgent);
+if (isSafari) document.documentElement.classList.add("is-safari");
 
 /* ---------- paper: torn edges ---------- */
 // jagged SVG strip glued to the top of every [data-tear] section (rim = paper fibre, fill = section colour)
@@ -51,10 +55,18 @@ function ripClip(el, amp = 1.1, n = 14) {
 }
 $$(".card__img").forEach((el) => ripClip(el));
 /* ---------- ink-bleed "boil" on hand-drawn bits ---------- */
-if (!reduced) {
+if (!reduced && !isSafari) {
   const noise = $("#rough-noise");
   let seed = 1;
   setInterval(() => noise.setAttribute("seed", (seed = (seed % 12) + 1)), 150);
+}
+
+
+// scroll-velocity burst that eases back to normal speed; one ticker callback instead of a new tween per scroll event
+function velocityDrive(tw, trigger, burst) {
+  let ts = 1;
+  ScrollTrigger.create({ ...trigger, onUpdate: (s) => { ts = burst(s); tw.timeScale(ts); } });
+  gsap.ticker.add(() => { if (Math.abs(ts - 1) > 0.002) tw.timeScale((ts += (1 - ts) * 0.06)); else if (ts !== 1) tw.timeScale((ts = 1)); });
 }
 
 /* ---------- smooth scroll ---------- */
@@ -179,20 +191,16 @@ function init() {
   /* marquee reacts to scroll velocity + direction */
   const track = $(".marquee__track");
   const tw = gsap.to(track, { xPercent: -50, ease: "none", duration: 26, repeat: -1 });
-  ScrollTrigger.create({
-    onUpdate: (self) => {
-      tw.timeScale(self.direction * (1 + Math.min(Math.abs(self.getVelocity()) / 180, 7)));
-      gsap.to(tw, { timeScale: 1, duration: 1, delay: 0.05, overwrite: true });
-    },
-  });
+  velocityDrive(tw, {}, (s) => s.direction * (1 + Math.min(Math.abs(s.getVelocity()) / 180, 7)));
 
   /* hero parallax out */
   gsap.to(".hero__title", { yPercent: -14, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
   gsap.to(".hero__scraps", { yPercent: -28, ease: "none", scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } });
+  const scrapMove = $$(".scrap").map((s) => ({ d: +s.dataset.depth, x: gsap.quickTo(s, "x", { duration: 1.2, ease: "power3.out" }), y: gsap.quickTo(s, "y", { duration: 1.2, ease: "power3.out" }) }));
   addEventListener("mousemove", (e) => {
     const mx = e.clientX / innerWidth - 0.5, my = e.clientY / innerHeight - 0.5;
-    $$(".scrap").forEach((s) => gsap.to(s, { x: mx * 70 * s.dataset.depth, y: my * 70 * s.dataset.depth, duration: 1.2, ease: "power3.out" }));
-  });
+    scrapMove.forEach((s) => (s.x(mx * 70 * s.d), s.y(my * 70 * s.d)));
+  }, { passive: true });
 
   /* work cards: rise, settle, inner parallax */
   $$(".card").forEach((c, i) => {
@@ -205,7 +213,7 @@ function init() {
   const dist = () => svcTrack.scrollWidth - innerWidth;
   gsap.to(svcTrack, {
     x: () => -dist(), ease: "none",
-    scrollTrigger: { trigger: ".services", pin: ".services__pin", start: "top top", end: () => "+=" + dist(), scrub: 1, invalidateOnRefresh: true },
+    scrollTrigger: { trigger: ".services", pin: ".services__pin", start: "top top", end: () => "+=" + dist(), scrub: 1, anticipatePin: 1, invalidateOnRefresh: true },
   });
 
   /* process: sticky stack that shrinks as the next card lands */
@@ -251,7 +259,7 @@ function init() {
   gsap.to(scrib, { strokeDashoffset: 0, duration: 1.2, ease: "power2.inOut", scrollTrigger: { trigger: ".clients__scribble", start: "top 88%" } });
   [[".ticker--a", -1], [".ticker--b", 1]].forEach(([sel, dir]) => {
     const t = $(".ticker__track", $(sel)), tw = gsap.fromTo(t, { xPercent: dir > 0 ? -50 : 0 }, { xPercent: dir > 0 ? 0 : -50, ease: "none", duration: 34, repeat: -1 });
-    ScrollTrigger.create({ trigger: sel, start: "top bottom", end: "bottom top", onUpdate: (s) => { tw.timeScale(1 + Math.min(Math.abs(s.getVelocity()) / 250, 5) * (s.direction === 1 ? 1 : -1) * 1); gsap.to(tw, { timeScale: 1, duration: 0.9, overwrite: true }); } });
+    velocityDrive(tw, { trigger: sel, start: "top bottom", end: "bottom top" }, (s) => 1 + Math.min(Math.abs(s.getVelocity()) / 250, 5) * (s.direction === 1 ? 1 : -1));
   });
   ScrollTrigger.refresh();
 }

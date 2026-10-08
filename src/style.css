@@ -31,8 +31,7 @@ svg { display: block; }
 .brush { font-family: var(--brush-f); font-weight: 400; }
 
 /* paper grain over everything */
-.grain { position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: .09; mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.grain { position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: .09; background-image: url("./assets/grain.png"); background-size: 220px 220px; }
 
 /* cursor */
 .cursor { position: fixed; top: 0; left: 0; z-index: 95; pointer-events: none; width: 16px; height: 16px; border-radius: 50%; background: var(--orange); display: grid; place-items: center; mix-blend-mode: normal; }
@@ -51,10 +50,10 @@ svg { display: block; }
 .hero::before, .work::before, .process::before, .contact::before, .viewer::before { left: 0; }
 
 /* coloured paper: texture multiplied over the flat colour */
-.services, .services__pin, .quote, .marquee { background-image: url("./assets/paper-cream.svg"); background-size: 1000px auto; background-blend-mode: multiply; }
+.services, .services__pin, .quote, .marquee { background-image: url("./assets/paper-fibers.png"); background-size: 1000px auto; }
 
 /* paper sections */
-.paper { background: var(--cream) url("./assets/paper-cream.svg") 50% 0 / 1000px auto repeat; color: var(--ink); }
+.paper { background: var(--cream) url("./assets/paper-cream.png") 50% 0 / 1000px auto repeat; color: var(--ink); }
 
 /* ---------- loader ---------- */
 .loader { position: fixed; inset: 0; z-index: 100; color: var(--orange); }
@@ -141,7 +140,7 @@ section { position: relative; }
 .card { display: block; width: 100%; text-align: left; background: none; border: 0; color: inherit; font: inherit; cursor: pointer; }
 .card--low { margin-top: 120px; }
 .card__img { position: relative; aspect-ratio: 4 / 3; background-color: var(--c); display: grid; place-items: center; overflow: hidden; color: var(--cream); transition: transform .6s cubic-bezier(.2,.8,.2,1); }
-.halftone::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(0,0,0,.22) 1.4px, transparent 1.9px); background-size: 8px 8px; mix-blend-mode: multiply; }
+.halftone::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(0,0,0,.22) 1.4px, transparent 1.9px); background-size: 8px 8px; }
 .halftone::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 40%, rgba(255,255,255,.35), transparent 65%); }
 .card__img svg { position: absolute; width: 38%; height: auto; aspect-ratio: 1; top: 14%; z-index: 1; }
 .card__img b { position: absolute; bottom: 8%; z-index: 1; font-size: clamp(40px, 5vw, 76px); line-height: 1; rotate: -3deg; text-shadow: 3px 3px 0 rgba(26,26,26,.55); }
@@ -287,3 +286,10 @@ section { position: relative; }
 .slice__layer { position: absolute; inset: 0; background: var(--cream); display: grid; place-content: center; justify-items: center; gap: 14px; will-change: transform; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; }
 .slice__mark svg { width: 130px; height: 130px; margin: 0 auto; }
 .slice__mark b { display: block; text-align: center; font-size: clamp(36px, 5vw, 64px); line-height: 1; rotate: -3deg; }
+
+/* ---------- Safari performance (same look; drops what WebKit renders slowly) ---------- */
+/* SVG filters on HTML/animated elements are CPU-rasterised in WebKit and re-run on every scroll/transform frame */
+.is-safari .rough, .is-safari .hero__title, .is-safari .h2, .is-safari .contact__title, .is-safari .step h3,
+.is-safari .cl__name, .is-safari .viewer__title, .is-safari .tear { filter: none; }
+/* keep scroll-driven layers on the GPU */
+.cl, .card svg, .hero__scraps, .scrap, .marquee__track, .ticker__track, .step { will-change: transform; }
