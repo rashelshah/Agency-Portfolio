@@ -429,3 +429,21 @@ section { position: relative; }
 .lc { text-transform: none; letter-spacing: 0; }
 .cform__msg a { color: var(--cream); border-bottom: 2px dashed var(--cream); }
 .cform__msg a:hover { color: var(--orange); border-color: var(--orange); }
+
+/* social links */
+.socials { display: flex; gap: 16px; justify-content: center; margin-top: clamp(56px, 7vw, 90px); }
+.socials a { width: 56px; height: 56px; display: grid; place-items: center; border: 3px solid var(--cream); border-radius: 50%; color: var(--cream); transition: background .25s, color .25s, border-color .25s, rotate .35s cubic-bezier(.2,.9,.3,1.5), translate .25s; }
+.socials a:nth-child(odd) { rotate: -5deg; } .socials a:nth-child(even) { rotate: 4deg; }
+.socials svg { width: 26px; height: 26px; }
+.socials a:hover { background: var(--orange); border-color: var(--orange); color: var(--cream); rotate: 0deg; translate: 0 -4px; }
+.menu__social { margin-top: 28px; font-size: 18px; color: var(--ink); }
+.menu__social a { border-bottom: 2px dashed var(--ink); } .menu__social a:hover { color: var(--cream); border-color: var(--cream); }
+.menu__foot { margin-top: 14px; }
+
+/* never clip big headings on small screens: they wrap instead */
+@media (max-width: 640px) {
+  .contact__title { font-size: clamp(30px, 8.4vw, 52px); white-space: normal; }
+  .h2 { font-size: clamp(44px, 14vw, 84px); overflow-wrap: anywhere; }
+  .contact__title, .h2, .hero__title { max-width: 100%; }
+}
+.foot nav { flex-wrap: wrap; justify-content: center; gap: 10px 24px; }
