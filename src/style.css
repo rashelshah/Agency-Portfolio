@@ -381,3 +381,51 @@ section { position: relative; }
 .slice__logo { display: none; width: 150px; height: 130px; object-fit: contain; margin: 0 auto; }
 .slice.logo-mark .slice__logo { display: block; }
 .slice.logo-mark .slice__mark svg { display: none; }
+
+/* ---------- trust pass: clearer hero, real contact flow ---------- */
+.hero__title { font-size: clamp(40px, 7.2vw, 118px); }
+@media (max-width: 640px) { .hero__title { font-size: 11.5vw; } }
+.hero__cta { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; margin-top: 34px; position: relative; z-index: 2; }
+.hero__cta .btn { margin-top: 0; padding: 14px 30px; font-size: 20px; }
+.btn--ghost { background: transparent; color: var(--cream); box-shadow: inset 0 0 0 2px var(--cream); }
+.btn--ghost:hover { background: var(--cream); color: var(--ink); }
+.cl__line { position: relative; justify-self: start; margin-top: 10px; font-size: 14px; line-height: 1.15; opacity: .92; max-width: 92%; }
+.vd__pr { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 40px; margin-top: 56px; max-width: 1000px; }
+.vd__pr[hidden], .vd__pr > [hidden] { display: none; }
+.vd__pr h3 { font-size: 20px; color: var(--orange); margin-bottom: 8px; }
+.vd__pr p { font-size: clamp(17px, 1.5vw, 21px); line-height: 1.4; }
+
+.contact__grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: clamp(32px, 6vw, 90px); width: min(1180px, 100%); margin-top: clamp(50px, 6vw, 80px); text-align: left; align-items: start; }
+.cform { display: grid; grid-template-columns: 1fr 1fr; gap: 22px 24px; }
+.cform__wide { grid-column: 1 / -1; }
+.cform label { display: grid; gap: 8px; font-size: 16px; letter-spacing: .08em; color: var(--orange); }
+.cform input, .cform select, .cform textarea { font: 500 18px "Archivo", system-ui, sans-serif; letter-spacing: 0; color: var(--cream); background: rgba(250,238,217,.06); border: 0; border-bottom: 2px solid var(--cream); border-radius: 4px 4px 0 0; padding: 12px 14px; outline: none; transition: border-color .25s, background .25s; }
+.cform select { appearance: none; cursor: pointer; background-image: linear-gradient(45deg, transparent 50%, var(--cream) 50%), linear-gradient(135deg, var(--cream) 50%, transparent 50%); background-position: calc(100% - 20px) 55%, calc(100% - 14px) 55%; background-size: 6px 6px; background-repeat: no-repeat; }
+.cform select option { color: var(--ink); }
+.cform textarea { resize: vertical; min-height: 110px; }
+.cform input:focus, .cform select:focus, .cform textarea:focus { border-color: var(--orange); background: rgba(250,238,217,.1); }
+.cform input.is-bad, .cform textarea.is-bad { border-color: #ff6a4d; }
+.cform__actions { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.cform__actions .btn { margin-top: 0; border: 0; cursor: pointer; }
+.cform__alt { font-size: 17px; letter-spacing: .08em; color: var(--cream); border-bottom: 2px dashed var(--cream); padding-bottom: 2px; }
+.cform__alt:hover { color: var(--orange); border-color: var(--orange); }
+.cform__msg { grid-column: 1 / -1; font-size: 18px; color: var(--orange); }
+.next { border: 3px solid var(--cream); border-radius: 6px; padding: clamp(22px, 2.6vw, 34px); box-shadow: 8px 9px 0 rgba(250,238,217,.18); rotate: 1deg; }
+.next h3 { font-size: 20px; color: var(--orange); margin-bottom: 18px; letter-spacing: .1em; }
+.next ol { display: grid; gap: 18px; list-style: none; }
+.next li { display: grid; grid-template-columns: 52px 1fr; gap: 14px; align-items: start; font-size: clamp(16px, 1.4vw, 19px); line-height: 1.35; }
+.next li b { font: 400 34px/1 var(--display); color: var(--orange); }
+.next .btn { margin-top: 26px; }
+.next .btn[hidden], .next__price[hidden] { display: none; }
+.next__price { margin-top: 16px; font-size: 18px; color: var(--orange); }
+.next__mail { margin-top: 24px; font-size: 16px; letter-spacing: .06em; }
+.next__mail a { color: var(--cream); border-bottom: 2px dashed var(--cream); }
+@media (max-width: 900px) { .contact__grid { grid-template-columns: 1fr; } .cform { grid-template-columns: 1fr; } }
+.contact { grid-template-columns: minmax(0, 1fr); }
+.contact__title { font-size: clamp(38px, 7.2vw, 118px); line-height: .95; }
+.hero__scroll { bottom: 26px; }
+
+/* e-mail addresses stay in lower case even inside the hand-lettered (all-caps) text */
+.lc { text-transform: none; letter-spacing: 0; }
+.cform__msg a { color: var(--cream); border-bottom: 2px dashed var(--cream); }
+.cform__msg a:hover { color: var(--orange); border-color: var(--orange); }

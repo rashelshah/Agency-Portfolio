@@ -73,7 +73,7 @@
     <li><a href="/#process"><i class="hand">03</i>Process</a></li>
     <li><a href="#contact"><i class="hand">04</i>Contact</a></li>
   </ul>
-  <p class="menu__foot hand">team@brisklabs.online &nbsp;·&nbsp; REMOTE · WORLDWIDE</p>
+  <p class="menu__foot hand"><span class="lc">team@brisklabs.online</span> &nbsp;·&nbsp; REMOTE · WORLDWIDE</p>
 </nav>
 
 
@@ -146,7 +146,7 @@
           <img loading="lazy" decoding="async" src="/src/assets/glyph.jpeg" alt="Glyph Project" style="width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0;" />
           <b class="brush"></b>
         </div>
-        <h3>GLYPH</h3><p class="hand">LATEX EDITOR · AI · WEBSITE</p>
+        <h3>GLYPH</h3><p class="hand">OPEN SOURCE · LATEX EDITOR · AI</p>
       </button>
       <button type="button" class="card card--low" data-project="3" data-cat="website" data-cursor="VIEW" style="--c:#6aa4c8">
         <div class="card__img halftone">
@@ -189,8 +189,33 @@
   </section>
 
   <footer class="contact" id="contact" data-theme="dark" data-tear="#1a1a1a">
-    <h2 class="contact__title" data-split="chars">LET’S MAKE<br>SOMETHING<br>LOUD.</h2>
-    <a class="btn btn--big" href="https://mail.google.com/mail/?view=cm&fs=1&to=team@brisklabs.online" target="_blank" rel="noopener noreferrer" data-magnetic>team@brisklabs.online</a>
+    <h2 class="contact__title" data-split="chars">TELL US WHAT<br>YOU’RE BUILDING.</h2>
+    <div class="contact__grid">
+      <form class="cform" id="cform" novalidate>
+        <label class="hand">YOUR NAME<input name="name" required autocomplete="name" /></label>
+        <label class="hand">YOUR EMAIL<input name="email" type="email" required autocomplete="email" /></label>
+        <label class="hand">WHEN DO YOU WANT TO LAUNCH?
+          <select name="timeline"><option>As soon as possible</option><option>In 1–3 months</option><option>Just exploring for now</option></select></label>
+        <label class="hand cform__wide">WHAT ARE YOU BUILDING? (A FEW LINES IS PLENTY)<textarea name="idea" rows="4" required></textarea></label>
+        <div class="cform__actions cform__wide">
+          <button class="btn" type="submit" data-magnetic>SEND IT OVER</button>
+          <a class="cform__alt hand" id="mailapp" href="mailto:team@brisklabs.online">OR USE YOUR MAIL APP</a>
+        </div>
+        <p class="cform__msg hand" role="status" hidden></p>
+      </form>
+      <aside class="next">
+        <h3 class="hand">WHAT HAPPENS NEXT</h3>
+        <ol>
+          <li><b>01</b><span>You send a short note about the idea.</span></li>
+          <li><b>02</b><span>We reply and set up a call to understand it properly.</span></li>
+          <li><b>03</b><span>You get a scoped plan and a fixed quote. No surprises.</span></li>
+        </ol>
+        <!-- fill these two in when you have them: they stay hidden while empty -->
+        <a class="btn btn--ghost" id="book" data-booking="" hidden target="_blank" rel="noopener noreferrer">BOOK A CALL</a>
+        <p class="next__price hand" id="price" data-price="" hidden></p>
+        <p class="next__mail hand">PREFER EMAIL? <a class="lc" href="mailto:team@brisklabs.online">team@brisklabs.online</a></p>
+      </aside>
+    </div>
     <div class="foot hand">
       <span>REMOTE · WORLDWIDE</span>
       <nav><a href="/">HOME</a><a href="/#services">SERVICES</a><a href="/#process">PROCESS</a><a href="#contact">CONTACT</a></nav>

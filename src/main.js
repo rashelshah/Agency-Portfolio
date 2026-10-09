@@ -296,7 +296,7 @@ function init() {
     const o = { v: 0 };
     ScrollTrigger.create({
       trigger: el, start: "top 90%", once: true,
-      onEnter: () => gsap.to(o, { v: +el.dataset.count, duration: 2, ease: "power2.out", onUpdate: () => (el.textContent = Math.round(o.v).toLocaleString() + "+") }),
+      onEnter: () => gsap.to(o, { v: +el.dataset.count, duration: 2, ease: "power2.out", onUpdate: () => (el.textContent = Math.round(o.v).toLocaleString() + (el.dataset.suffix ?? "+")) }),
     });
   });
 
@@ -468,6 +468,8 @@ const PROJECTS = [
     dir.textContent = meta;
     $(".viewer__count").textContent = `WORK ${pad(i + 1)} / ${pad($$(".card").length)}`;
     $(".vd__lead").textContent = p.lead;
+    [["p", p.problem], ["r", p.result]].forEach(([k, t]) => { const box = $(".vd__" + k); box.hidden = !t; if (t) $("p", box).textContent = t; });   // shown only when real text exists
+    $(".vd__pr").hidden = !(p.problem || p.result);
     $(".vd__tags").innerHTML = meta.split("·").map((t) => `<li>${t.trim()}</li>`).join("");
     $(".vd__stats").innerHTML = p.stats.map(([n, l]) => `<li><b>${n}</b><span>${l}</span></li>`).join("");
     
@@ -633,6 +635,58 @@ const PROJECTS = [
   $$(".vd__lead, .vd__cols > *, .vd__cta").forEach((el) =>
     gsap.from(el, { y: 50, opacity: 0, duration: 0.9, ease: "power3.out", scrollTrigger: { trigger: el, scroller: v, start: "top 88%" } })
   );
+}
+
+
+/* ---------- contact: opens the right mail route on every device ---------- */
+// phones -> the native mail app (mailto);  computers -> Gmail compose in a new tab;  everything else (Outlook, mail app, copy) one tap away.
+// Optional: set data-booking on #book and data-price on #price in the contact markup to show a booking button / starting price.
+{
+  const form = $("#cform");
+  if (form) {
+    const book = $("#book"), price = $("#price");
+    if (book.dataset.booking) { book.href = book.dataset.booking; book.hidden = false; }
+    if (price.dataset.price) { price.textContent = price.dataset.price; price.hidden = false; }
+    const msg = $(".cform__msg", form), mailApp = $("#mailapp");
+    const isPhone = !!navigator.userAgentData?.mobile || /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /macintosh/i.test(navigator.userAgent));
+    const read = () => { const f = new FormData(form); return { f, subject: "New project: " + (f.get("name") || "enquiry"), body: `Name: ${f.get("name")}\nEmail: ${f.get("email")}\nLaunch: ${f.get("timeline")}\n\nWhat we're building:\n${f.get("idea")}` }; };
+    const urls = () => {
+      const { subject, body } = read(), s = encodeURIComponent(subject), b = encodeURIComponent(body);
+      return { subject, body, mailto: `mailto:${MAIL}?subject=${s}&body=${b}`, gmail: `https://mail.google.com/mail/?view=cm&fs=1&to=${MAIL}&su=${s}&body=${b}`, outlook: `https://outlook.live.com/mail/0/deeplink/compose?to=${MAIL}&subject=${s}&body=${b}` };
+    };
+    const syncMailto = () => (mailApp.href = urls().mailto);
+    form.addEventListener("input", syncMailto);
+    const copy = async () => {
+      const u = urls(), text = `To: ${MAIL}\nSubject: ${u.subject}\n\n${u.body}`;
+      try { await navigator.clipboard.writeText(text); msg.innerHTML = 'COPIED. PASTE IT INTO ANY EMAIL TO <span class="lc">' + MAIL + "</span>."; } catch (e) { window.prompt("Copy this message and email it to " + MAIL, text); }
+    };
+    // every route in one line; buttons are real links, so they also work with long-press / middle-click
+    const routes = (lead) => {
+      const u = urls();
+      msg.hidden = false;
+      msg.innerHTML = `${lead}<br><a href="${u.mailto}">MAIL APP</a> · <a href="${u.gmail}" target="_blank" rel="noopener noreferrer">GMAIL</a> · <a href="${u.outlook}" target="_blank" rel="noopener noreferrer">OUTLOOK</a> · <a href="#" data-copy>COPY MESSAGE</a> · <span class="lc">${MAIL}</span>`;
+      $("[data-copy]", msg).addEventListener("click", (e) => { e.preventDefault(); copy(); });
+    };
+    // a mailto: on a computer with no mail app does nothing: notice that the page never lost focus and offer the other routes
+    const watchMailto = () => {
+      if (isPhone) return;
+      let left = false; const gone = () => (left = true);
+      addEventListener("blur", gone, { once: true }); document.addEventListener("visibilitychange", gone, { once: true });
+      setTimeout(() => { removeEventListener("blur", gone); if (!left) routes("NO MAIL APP ANSWERED ON THIS COMPUTER. PICK ANOTHER WAY:"); }, 1400);
+    };
+    mailApp.addEventListener("click", watchMailto);
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const { f } = read(), bad = ["name", "email", "idea"].filter((k) => !String(f.get(k)).trim() || (k === "email" && !/^\S+@\S+\.\S+$/.test(f.get(k))));
+      $$("input, textarea", form).forEach((el) => el.classList.toggle("is-bad", bad.includes(el.name)));
+      if (bad.length) { msg.hidden = false; msg.textContent = "A NAME, A VALID EMAIL AND A FEW LINES ABOUT THE IDEA, PLEASE."; return; }
+      const u = urls();
+      if (isPhone) { routes("OPENING YOUR MAIL APP WITH THE MESSAGE READY. NOT OPENING?"); location.href = u.mailto; return; }
+      const w = window.open(u.gmail, "_blank", "noopener,noreferrer");
+      routes(w ? "GMAIL OPENED IN A NEW TAB WITH YOUR MESSAGE: PRESS SEND THERE. NOT ON GMAIL?" : "YOUR BROWSER BLOCKED THE NEW TAB. PICK A WAY:");
+    });
+    syncMailto();
+  }
 }
 
 /* go */
