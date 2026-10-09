@@ -553,12 +553,22 @@ const PROJECTS = [
   arrive = async (name, onStart) => {
     prepSlice(0, false, { icon: "d-browser", name });
     sL.style.transform = sR.style.transform = ""; sC.style.clipPath = GONE; sliceEl.style.opacity = 1;
-    $(".loader")?.remove();                      // the loader is the same cream, so the swap is invisible
-    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));   // let the page paint before moving anything
+    sliceEl.style.pointerEvents = "none";           // an opening sheet must never be able to swallow clicks
+    $(".loader")?.remove();                         // the loader is the same cream, so the swap is invisible
+    let started = false;
+    const start = () => { if (!started) { started = true; onStart?.(); } };
+    // safety net: whatever the browser does (background tab, slow device), the page is released after 3.5s
+    const release = () => { start(); endSlice(); };
+    const watchdog = setTimeout(release, 3500);
+    document.addEventListener("visibilitychange", () => { if (!document.hidden && sliceEl.style.visibility === "visible" && !started) release(); }, { once: true });
+    // wait for a paint, but never depend on one (requestAnimationFrame does not fire in a hidden tab)
+    await Promise.race([new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))), wait(150)]);
     await wait(220);
-    const slide = apart(); onStart?.();
-    await slide; endSlice();
+    const slide = apart(); start();
+    await Promise.race([slide, wait(1800)]);
+    clearTimeout(watchdog); endSlice();
   };
+
 
   async function open(i, card) {
     if (isOpen || busy) return;
@@ -626,7 +636,7 @@ const PROJECTS = [
     busy = true; lenis?.stop();
     sessionStorage.setItem("quickLoad", a.dataset.page);
     prepSlice(0, true, { icon: "d-browser", name: a.dataset.page });
-    await together();
+    await Promise.race([together(), wait(1300)]);   // never let a stalled animation block the navigation
     location.href = a.href;
   }));
   addEventListener("keydown", (e) => { if (!isOpen) return; if (e.key === "Escape") close(); if (e.key === "ArrowRight") go(1); if (e.key === "ArrowLeft") go(-1); });
