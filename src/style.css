@@ -225,9 +225,34 @@ section { position: relative; }
 .step svg { position: absolute; right: 5%; bottom: 8%; width: clamp(70px, 10vw, 140px); aspect-ratio: 1; opacity: .9; }
 
 /* ---------- quote ---------- */
-.quote { background-color: var(--pink); color: var(--ink); padding: clamp(120px, 15vw, 220px) var(--pad) clamp(110px, 12vw, 180px); text-align: center; }
-.quote blockquote { max-width: 1100px; margin: 0 auto; font: 400 clamp(32px, 5.2vw, 80px)/1.04 var(--display); text-transform: uppercase; }
-.quote p { margin-top: 36px; font-size: 24px; }
+.quote { position: relative; overflow: hidden; background-color: var(--pink); color: var(--ink); padding: clamp(120px, 14vw, 210px) var(--pad) clamp(110px, 12vw, 170px) calc(var(--pad) + 40px); }
+.quote__inner { max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: clamp(36px, 6vw, 100px); align-items: center; }
+.quote__main { position: relative; }
+.quote__mark { display: block; font: 400 clamp(150px, 20vw, 300px)/.62 var(--display); height: .42em; color: var(--orange); -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill; rotate: -4deg; margin-bottom: 8px; }
+.quote__stage { display: grid; }
+.qt { grid-area: 1 / 1; margin: 0; visibility: hidden; opacity: 0; }
+.qt.is-on { visibility: visible; opacity: 1; }
+.qt blockquote { font: 400 clamp(24px, 3.2vw, 46px)/1.14 var(--display); text-transform: uppercase; letter-spacing: -.005em; }
+.qt figcaption { display: flex; align-items: center; gap: 18px; margin-top: clamp(26px, 3vw, 44px); }
+.qt__avatar { flex: none; width: 74px; height: 74px; border-radius: 50%; display: grid; place-items: center; background: var(--cream); border: 3px solid var(--ink); box-shadow: 5px 6px 0 var(--ink); font: 400 26px var(--display); rotate: -6deg; }
+.qt__name { display: block; font: 400 clamp(22px, 2.1vw, 32px)/1 var(--display); text-transform: uppercase; }
+.qt__role { display: block; margin-top: 6px; font-size: clamp(15px, 1.4vw, 19px); }
+.quote__nav { display: flex; align-items: center; gap: 14px; margin-top: clamp(30px, 3.4vw, 50px); font-size: 18px; }
+.qbtn { width: 54px; height: 54px; border-radius: 50%; border: 3px solid var(--ink); background: var(--cream); color: var(--ink); font: 400 26px var(--hand-f); cursor: pointer; box-shadow: 4px 5px 0 var(--ink); transition: translate .25s, box-shadow .25s, background .25s, color .25s; }
+.qbtn:hover { background: var(--ink); color: var(--cream); translate: 0 -3px; box-shadow: 4px 8px 0 var(--ink); }
+.qbtn:active { translate: 2px 2px; box-shadow: 1px 2px 0 var(--ink); }
+.quote__count { margin-left: 8px; letter-spacing: .12em; }
+.quote__bar { flex: 1; max-width: 220px; height: 5px; border-radius: 4px; background: rgba(26,26,26,.2); overflow: hidden; }
+.quote__bar i { display: block; height: 100%; background: var(--ink); transform-origin: 0 50%; transform: scaleX(var(--q, 0)); }
+.quote__chips { display: grid; gap: 16px; }
+.qchip { display: flex; align-items: center; gap: 14px; padding: 16px 18px; text-align: left; font: 400 clamp(20px, 1.8vw, 26px)/1.05 var(--display); text-transform: uppercase; color: var(--ink); background: var(--cream) url("./assets/paper-cream.png") 0 0 / 500px auto; border: 3px solid var(--ink); border-radius: 6px; box-shadow: 6px 7px 0 var(--ink); cursor: pointer; rotate: -1.4deg; transition: rotate .35s cubic-bezier(.2,.9,.3,1.4), translate .35s cubic-bezier(.2,.9,.3,1.4), background .25s, color .25s, box-shadow .25s; }
+.qchip:nth-child(even) { rotate: 1.2deg; }
+.qchip i { font: 400 18px var(--hand-f); font-style: normal; color: var(--orange); }
+.qchip:hover { rotate: 0deg; translate: -4px -3px; box-shadow: 10px 11px 0 var(--ink); }
+.qchip.is-on { background: var(--orange) url("./assets/paper-fibers.png") 0 0 / 700px auto; color: var(--cream); rotate: 0deg; translate: 10px 0; box-shadow: 8px 9px 0 var(--ink); }
+.qchip.is-on i { color: var(--ink); }
+@media (max-width: 900px) { .quote { padding-left: var(--pad); } .quote__inner { grid-template-columns: 1fr; } .quote__chips { grid-template-columns: 1fr 1fr; gap: 12px; } .qchip { padding: 12px 14px; font-size: 16px; } }
+@media (max-width: 520px) { .quote__chips { grid-template-columns: 1fr; } }
 
 /* ---------- contact ---------- */
 .contact { padding: clamp(130px, 16vw, 230px) var(--pad) 40px; text-align: center; display: grid; justify-items: center; }

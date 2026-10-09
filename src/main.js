@@ -197,6 +197,50 @@ function headTheme() {
 
 }
 
+
+/* ---------- reviews: auto-advancing quotes with line-mask transitions ---------- */
+function initQuotes() {
+  const figs = $$(".qt"), chips = $$(".qchip"), count = $(".quote__count"), sec = $(".quote"), bar = $(".quote__bar i");
+  if (!figs.length) return;
+  const splits = figs.map((f) => SplitText.create($("blockquote", f), { type: "lines", mask: "lines", linesClass: "ln", autoSplit: true }));
+  const DUR = 8;
+  let cur = 0, busy = false, auto = null, inView = false, hover = false;
+  const prog = { v: 0 };
+  const restart = () => {
+    auto?.kill(); prog.v = 0; bar.parentElement.style.setProperty("--q", 0);
+    auto = gsap.to(prog, { v: 1, duration: DUR, ease: "none", onUpdate: () => bar.parentElement.style.setProperty("--q", prog.v), onComplete: () => go(cur + 1) });
+    if (!inView || hover) auto.pause();
+  };
+  const show = (i, first) => {
+    const f = figs[i], lines = splits[i].lines, who = $("figcaption", f);
+    f.classList.add("is-on");
+    gsap.fromTo(lines, { yPercent: 115 }, { yPercent: 0, duration: first ? 1 : 0.85, stagger: 0.09, ease: "power4.out" });
+    gsap.fromTo(who, { y: 22, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, delay: 0.25, ease: "power3.out" });
+    gsap.fromTo($(".qt__avatar", f), { scale: 0, rotate: -40 }, { scale: 1, rotate: -6, duration: 0.7, delay: 0.2, ease: "back.out(2.4)" });
+  };
+  const go = (n) => {
+    n = (n + figs.length) % figs.length;
+    if (busy || n === cur) return;
+    busy = true;
+    const old = figs[cur];
+    gsap.timeline({ onComplete: () => { old.classList.remove("is-on"); cur = n; chips.forEach((c, k) => c.classList.toggle("is-on", k === n)); count.textContent = `0${n + 1} / 0${figs.length}`; show(n); busy = false; restart(); } })
+      .to(splits[cur].lines, { yPercent: -115, duration: 0.45, stagger: 0.05, ease: "power3.in" })
+      .to($("figcaption", old), { opacity: 0, y: -14, duration: 0.3 }, 0);
+    chips.forEach((c, k) => c.classList.toggle("is-on", k === n));
+    count.textContent = `0${n + 1} / 0${figs.length}`;
+  };
+  $(".qnext").addEventListener("click", () => go(cur + 1));
+  $(".qprev").addEventListener("click", () => go(cur - 1));
+  chips.forEach((c) => c.addEventListener("click", () => go(+c.dataset.i)));
+  $(".quote__main").addEventListener("mouseenter", () => { hover = true; auto?.pause(); });
+  $(".quote__main").addEventListener("mouseleave", () => { hover = false; inView && auto?.play(); });
+  // first quote reveals when the section scrolls in; autoplay only runs while it is on screen
+  gsap.set(splits[0].lines, { yPercent: 115 });
+  gsap.set($("figcaption", figs[0]), { opacity: 0 });
+  ScrollTrigger.create({ trigger: sec, start: "top 70%", end: "bottom 15%", onToggle: (s) => { inView = s.isActive; if (inView && !sec.dataset.shown) { sec.dataset.shown = 1; show(0, true); } inView && !hover ? auto?.play() : auto?.pause(); } });
+  restart();
+}
+
 /* ---------- all-projects page ---------- */
 function initWorkPage() {
   reveals();
@@ -295,6 +339,8 @@ function init() {
   });
 
   headTheme();
+
+  initQuotes();
 
   /* clients: stamp-in cards, parallax, tilt, drawn scribble, tickers */
   const clientCards = $$(".cl__card");
