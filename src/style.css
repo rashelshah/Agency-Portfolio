@@ -152,7 +152,7 @@ section { position: relative; }
 .btn--big { font-size: clamp(22px, 3.4vw, 46px); padding: 26px 56px; margin-top: 60px; }
 
 /* ---------- clients ---------- */
-.clients { padding: clamp(110px, 14vw, 200px) var(--pad) 90px calc(var(--pad) + 40px); overflow: hidden; }
+.clients { padding: clamp(110px, 14vw, 200px) var(--pad) 90px calc(var(--pad) + 40px); overflow-x: clip; }
 .clients__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 40px; flex-wrap: wrap; }
 .clients .h2 { color: var(--ink); }
 .clients__note { max-width: 340px; font-size: clamp(16px, 1.5vw, 21px); line-height: 1.25; padding-bottom: 14px; rotate: 2deg; }
@@ -225,7 +225,7 @@ section { position: relative; }
 .step svg { position: absolute; right: 5%; bottom: 8%; width: clamp(70px, 10vw, 140px); aspect-ratio: 1; opacity: .9; }
 
 /* ---------- quote ---------- */
-.quote { position: relative; overflow: hidden; background-color: var(--pink); color: var(--ink); padding: clamp(120px, 14vw, 210px) var(--pad) clamp(110px, 12vw, 170px) calc(var(--pad) + 40px); }
+.quote { position: relative; overflow-x: clip; background-color: var(--pink); color: var(--ink); padding: clamp(120px, 14vw, 210px) var(--pad) clamp(110px, 12vw, 170px) calc(var(--pad) + 40px); }
 .quote__inner { max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: clamp(36px, 6vw, 100px); align-items: center; }
 .quote__main { position: relative; }
 .quote__mark { display: block; font: 400 clamp(150px, 20vw, 300px)/.62 var(--display); height: .42em; color: var(--orange); -webkit-text-stroke: 3px var(--ink); paint-order: stroke fill; rotate: -4deg; margin-bottom: 8px; }
@@ -447,3 +447,4 @@ section { position: relative; }
   .contact__title, .h2, .hero__title { max-width: 100%; }
 }
 .foot nav { flex-wrap: wrap; justify-content: center; gap: 10px 24px; }
+.socials svg { width: 24px; height: 24px; }
